@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="OpenRefine">
+        <wb-resource deploy-path="/" source-path="/main/src"/>
+        <wb-resource deploy-path="/" source-path="/server/src"/>
+        <wb-resource deploy-path="/" source-path="/extensions/freebase/src"/>
+        <wb-resource deploy-path="/" source-path="/extensions/gdata/src"/>
+        <wb-resource deploy-path="/" source-path="/extensions/jython/src"/>
+        <wb-resource deploy-path="/" source-path="/extensions/pc-axis/src"/>
+        <wb-resource deploy-path="/" source-path="/extensions/sample/src"/>
+        <wb-resource deploy-path="/" source-path="/main/tests/server/src"/>
+    </wb-module>
+</project-modules>
