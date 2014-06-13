@@ -48,16 +48,20 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
          */
         int sid = Integer.valueOf(parameters.getProperty("sid"));
         String tableName = parameters.getProperty("tableName");
-
+        int userId = Integer.valueOf(parameters.getProperty("userId"));
+//        String currentUser = getUser(userId);
+        
         JSONObject result = new JSONObject();
 
         boolean isTimeOut = false;
         boolean isTableLocked = isTableLocked(sid, tableName);
-
+        boolean isEditingByCurrentUser = false;
+        
         String msg = "";
 
         if (isTableLocked) {
             msg += "Table is locked! ";
+            isEditingByCurrentUser = isEditingByCurrentUser(sid, tableName, userId);
             if (isTimeOut(sid, tableName)) {
                 msg += "Someone was editing this table, but time's out now, so release this table for you! ";
                 isTimeOut = true;
@@ -65,13 +69,14 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
             }
         }
         // if (true) {
-        if (isTableLocked && !isTimeOut) {
+        if (!isEditingByCurrentUser && (isTableLocked && !isTimeOut)) {
             msg += "Someone is editing this table!";
         } else {
             // TODO: CurrentUser needs to be a parameter but not hard code which
             // is from JavaScript
-            String currentUser = "xxl2";
-            createEditLog(sid, tableName, currentUser);
+//            String currentUser = "xxl2";
+            if(!isEditingByCurrentUser)
+                createEditLog(sid, tableName, userId);
 
             ProjectManager.singleton.setBusy(true);
             try {
@@ -130,17 +135,20 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
                 }
 
                 String url = "http://127.0.0.1:3333/project?project=" + projectLink;
-                URI uri = null;
-                try {
-                    uri = new java.net.URI(url);
-                } catch (Exception e) {
-                    System.out.println("Failed to load webpage!");
-                }
-                try {
-                    java.awt.Desktop.getDesktop().browse(uri);
-                } catch (Exception e) {
-                    System.out.println("Failed to open browser");
-                }
+                
+                result.put("openrefineURL", url);
+                
+//                URI uri = null;
+//                try {
+//                    uri = new java.net.URI(url);
+//                } catch (Exception e) {
+//                    System.out.println("Failed to load webpage!");
+//                }
+//                try {
+//                    java.awt.Desktop.getDesktop().browse(uri);
+//                } catch (Exception e) {
+//                    System.out.println("Failed to open browser");
+//                }
 
             } catch (Exception e) {
                 respondWithErrorPage(request, response, "Failed to import file", e);
@@ -150,9 +158,10 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
         }
 
         try {
-            // result.put("testMsg", testMsg);
-            result.put("isEditing", isTableLocked);
-            result.put("msg", msg);
+//            result.put("testMsg", userId);
+            result.put("isEditing", isTableLocked && !isEditingByCurrentUser);
+            result.put("isTimeOut", isTimeOut);
+            result.put("msg", "Table is editing by User: " + getUserLoginById(userId));
             result.put("successful", true);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -163,6 +172,71 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
         respond(response, result.toString());
     }
 
+    public String getUserLoginById(int userId) {
+        String driver = "com.mysql.jdbc.Driver";
+        String dbURL = "jdbc:mysql://127.0.0.1:3306/colfusion"; // Connect
+                                                                // to
+                                                                // Server
+                                                                // &
+                                                                // DB连接服务器和数据库test
+        String userName = "root"; // UserName 用户名
+        String userPwd = ""; // Pwd 密码
+
+        String userLogin = "";
+        
+        try {
+            Class.forName(driver);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        Connection conn;
+        try {
+            conn = DriverManager.getConnection(dbURL, userName, userPwd);
+            String query = "SELECT user_login FROM colfusion_users WHERE user_id = " + userId;
+            Statement ps = conn.createStatement();
+            ResultSet result = ps.executeQuery(query);
+            while (result.next()) {
+                userLogin = result.getString("user_login");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return userLogin;
+    }
+    
+    public boolean isEditingByCurrentUser(int sid, String tableName, int userId) {
+        String driver = "com.mysql.jdbc.Driver";
+        String dbURL = "jdbc:mysql://127.0.0.1:3306/colfusion"; // Connect
+                                                                // to
+                                                                // Server
+                                                                // &
+                                                                // DB连接服务器和数据库test
+        String userName = "root"; // UserName 用户名
+        String userPwd = ""; // Pwd 密码
+
+        try {
+            Class.forName(driver);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        Connection conn;
+        try {
+            conn = DriverManager.getConnection(dbURL, userName, userPwd);
+            String query = "SELECT endChangeTime FROM colfusion_table_change_log WHERE sid = " + sid
+                    + " AND tableName = '" + tableName + "' AND operatedUser = " + userId;
+            Statement ps = conn.createStatement();
+            ResultSet result = ps.executeQuery(query);
+            while (result.next()) {
+                if (result.getDate("endChangeTime") == null) return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    
     public void releaseTableLock(int sid, String tableName) {
         String driver = "com.mysql.jdbc.Driver";
         String dbURL = "jdbc:mysql://127.0.0.1:3306/colfusion"; // Connect
@@ -270,7 +344,7 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
         return false;
     }
 
-    public void createEditLog(int sid, String tableName, String currentUser) {
+    public void createEditLog(int sid, String tableName, int userId) {
         String driver = "com.mysql.jdbc.Driver";
         String dbURL = "jdbc:mysql://127.0.0.1:3306/colfusion"; // Connect
                                                                 // to
@@ -293,7 +367,7 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
         try {
             conn = DriverManager.getConnection(dbURL, userName, userPwd);
             String query = "INSERT INTO colfusion_table_change_log VALUES(" + sid + ", '" + tableName + "', '"
-                    + startEditTime + "', NULL, '" + currentUser + "')";
+                    + startEditTime + "', NULL, " + userId + ")";
             Statement ps = conn.createStatement();
             ps.executeUpdate(query);
 

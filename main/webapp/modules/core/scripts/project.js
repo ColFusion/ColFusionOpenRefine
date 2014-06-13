@@ -476,7 +476,8 @@ Refine.saveChangesColFusionDB = function(openRefinProjectId) {  // Alex
       success: function(data) {                
           if (data.successful) {                   
               var testMsg = data.payload;
-              alert(testMsg);                  
+              alert(testMsg);
+              window.close();
           }
       }
    });
