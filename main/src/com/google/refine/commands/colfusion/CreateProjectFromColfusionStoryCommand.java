@@ -105,7 +105,7 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
                     ppm.setEncoding("UTF-8");
                     setProject(sid, project);
 
-                    File dir = new File("C:\\Users\\xxl\\AppData\\Roaming\\OpenRefine");
+                    File dir = new File("C:\\Users\\Yeqiu\\AppData\\Roaming\\OpenRefine");
 
                     FileProjectManager.initialize(dir);
 
@@ -135,6 +135,7 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
                 }
 
                 String url = "http://127.0.0.1:3333/project?project=" + projectLink;
+
                 
                 result.put("openrefineURL", url);
                 
@@ -149,6 +150,7 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
 //                } catch (Exception e) {
 //                    System.out.println("Failed to open browser");
 //                }
+
 
             } catch (Exception e) {
                 respondWithErrorPage(request, response, "Failed to import file", e);
