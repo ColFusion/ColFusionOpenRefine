@@ -57,6 +57,8 @@ function registerCommands() {
   
   RS.registerCommand(module, "create-project-from-colfusion-story", new Packages.com.google.refine.commands.colfusion.CreateProjectFromColfusionStoryCommand());
   RS.registerCommand(module, "is-table-locked", new Packages.com.google.refine.commands.colfusion.IsTableLockedCommand());
+  RS.registerCommand(module, "release-table", new Packages.com.google.refine.commands.colfusion.ReleaseTableCommand());
+  RS.registerCommand(module, "timeout-notice", new Packages.com.google.refine.commands.colfusion.TimeOutNoticeCommand());
 
   RS.registerCommand(module, "get-importing-configuration", new Packages.com.google.refine.commands.importing.GetImportingConfigurationCommand());
   RS.registerCommand(module, "create-importing-job", new Packages.com.google.refine.commands.importing.CreateImportingJobCommand());

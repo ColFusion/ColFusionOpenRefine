@@ -56,34 +56,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
         
         <button onclick = saveData()>Save</button> <!-- Alex Button, alexbutton-->
-        <!-- <button onclick = cancelData()>Cancel</button> Alex Button, alexbutton-->
+        
+        
         <script type="text/javascript">
-            // alert("hello!!!test11!");
-            // // var test = "abc";
-            // window.onbeforeunload = function() {
-            //   alert("jjjj");
-            //   return "mmm";
-            // };
-            // window.onunload = function () {
-            //   Refine.testClose();
-            //   return "eeeee";
-            // }
 
-/* To use this function, can add "onUnload="testMyClose()"" in <body> tag
-*/
-// function testMyClose() {
-//   alert("successful!");
-//   return "asdfa";
-// }
-
-
-
-
-
-            function saveData() {
-                Refine.saveChangesColFusionDB(theProject.id);
-              }
+          function saveData() {
+            
+            var userId = window.location.href.split('#')[1];
+            Refine.saveChangesColFusionDB(theProject.id, userId);
+          
+          }
+        
         </script>
+
+
+
+
+
+
+
+
+
+
+
         <script type="text/javascript">
              function cancelData() {
                 Refine.cancelChangesColFusionDB(theProject.id);

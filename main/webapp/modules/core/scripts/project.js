@@ -466,14 +466,16 @@ Refine.getPermanentLink = function() {
   return "project?" + params.join("&");
 };
 
-Refine.saveChangesColFusionDB = function(openRefinProjectId) {  // Alex
+Refine.saveChangesColFusionDB = function(openRefinProjectId, colfusionUserId) {  // Alex
   $.ajax({
-      url: "http://localhost:8080/ColFusionServer/OpenRefine/saveChanges/" + openRefinProjectId, 
+      // url: "http://localhost:8080/ColFusionServer/OpenRefine/saveChanges/" + openRefinProjectId + "/" + $("#user_id").val(),
+      url: "http://localhost:8080/ColFusionServer/OpenRefine/saveChanges/" + openRefinProjectId + "/" + colfusionUserId, 
       type: 'GET',
       dataType: 'json',
       contentType: "application/json",
       crossDomain: true,
-      success: function(data) {                
+      success: function(data) {
+        // alert("fffaaa");
           if (data.successful) {                   
               var testMsg = data.payload;
               alert(testMsg);

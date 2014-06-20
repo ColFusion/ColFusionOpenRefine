@@ -61,4 +61,6 @@ public abstract class DatabaseHandler {
     public abstract int getColCount(final int sid, final String tableName) throws SQLException;
     
     public abstract ArrayList<ArrayList<String>> getRows(final String tableName, final int colCount) throws SQLException;
+    
+    public abstract void createTable(final int sid, final String tableName) throws SQLException;
 }

@@ -192,5 +192,28 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
             throw e;
         }
     }
+    @Override
+    public void createTable(final int sid, final String tableName)
+            throws SQLException {
+        logger.info(String.format("Creating table from temp_table for sid %d and tablename %s", sid, tableName));
+
+        try (Connection connection = getConnection()) {
+
+            String sql = String.format("CREATE TABLE %s SELECT * FROM %s", tableName, "temp_" + tableName);
+
+            try (Statement statement = connection.createStatement()) {
+
+                statement.executeUpdate(sql);
+
+            } catch (SQLException e) {
+                logger.error(String.format("Creating table from temp_table for sid %d and tablename %s FAILED", sid, tableName), e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to Creating table from temp_table for sid %d and tablename %s", sid, tableName));
+            throw e;
+        }
+    }
 
 }

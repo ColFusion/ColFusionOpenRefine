@@ -268,6 +268,45 @@ public class MetadataDbHandler {
             throw e;
         }
     }
+    
+    public boolean isTimeOutForCurrentUser(final int sid, final String tableName, final int colfusionUserId, final int allowedTime)
+            throws SQLException {
+        logger.info(String.format("Getting if it is timeout for sid %d and table %s", sid, tableName));
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentTime = format.format(new Date());
+
+        String startTime = "";
+
+        try (Connection connection = dbHandler.getConnection()) {
+
+            String sql = "SELECT startChangeTime FROM colfusion_table_change_log WHERE endChangeTime is NULL and sid = ? AND tableName = ? AND operatedUser = ?";
+
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+                statement.setInt(1, sid);
+                statement.setString(2, tableName);
+                statement.setInt(3, colfusionUserId);
+
+                ResultSet rs = statement.executeQuery();
+                while (rs.next()) {
+                    startTime = rs.getString("startChangeTime");
+                    return isTimeOutHelper(currentTime, startTime, allowedTime);
+                }
+                return true;
+
+            } catch (SQLException e) {
+                logger.error(String.format("Getting if it is timeout for sid %d and table %s FAILED", sid, tableName),
+                        e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to getting if it is timeout for sid %d and table %s ", sid, tableName));
+            throw e;
+        }
+    }
+    
 
     public boolean isTimeOutHelper(final String currentTime, String startTime, final int allowedTime) {
         if (!currentTime.split(" ")[0].equals(startTime.split(" ")[0])) {
@@ -570,6 +609,64 @@ public class MetadataDbHandler {
             }
         } catch (SQLException e) {
             logger.info(String.format("FAILED to getting if still in the session for sid %d, tableName %s and user %d", sid, tableName, colfusionUserId));
+            throw e;
+        }
+    }
+    
+    public int getSid(final String projectId) throws SQLException {
+        logger.info(String.format("Getting sid for project %s", projectId));
+        
+        try (Connection connection = dbHandler.getConnection()) {
+
+            
+            String sql = "select sid from colfusion_openrefine_project_map where projectId = ?";
+            
+            String sid = "";
+            
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, projectId);
+
+                ResultSet rs = statement.executeQuery();
+
+
+                while (rs.next()) {
+                    sid = rs.getString(1);
+            }
+                return Integer.valueOf(sid);
+            } catch (SQLException e) {
+                logger.error(String.format("Getting sid for project %s FAILED", projectId), e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to getting sid for project %s", projectId));
+            throw e;
+        }
+    }
+    
+    public String getTableNameByProjectId(final String projectId) throws SQLException {
+        logger.info(String.format("Getting tableName for project %s", projectId));
+
+        try (Connection connection = dbHandler.getConnection()) {
+
+            String sql = "select tableName from colfusion_openrefine_project_map where projectId = ?";
+
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, projectId);
+
+                ResultSet rs = statement.executeQuery();
+                String tableName = "";
+                while (rs.next()) {
+                    tableName = rs.getString("tableName");
+                }
+                return tableName;
+            } catch (SQLException e) {
+                logger.error(String.format("Getting tableName for project %s FAILED", projectId), e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to getting tableName for project %s", projectId));
             throw e;
         }
     }
