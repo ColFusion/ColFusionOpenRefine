@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package com.google.refine.commands.project;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +41,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.refine.ProjectManager;
 import com.google.refine.commands.Command;
-import com.google.refine.myDatabase.DatabaseOperation;
 
 public class DeleteProjectCommand extends Command {
     @Override
@@ -51,18 +49,18 @@ public class DeleteProjectCommand extends Command {
         
         try {
             long projectID = Long.parseLong(request.getParameter("project"));
-            String projectname =  ProjectManager.singleton.getProject(projectID).getMetadata().getName();
+//            String projectname =  ProjectManager.singleton.getProject(projectID).getMetadata().getName();
             ProjectManager.singleton.deleteProject(projectID);
             
             respond(response, "{ \"code\" : \"ok\" }");
             
-            try {
-                DatabaseOperation.dababaseTableDrop(projectname, projectID);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                DatabaseOperation.dababaseTableDrop(projectname, projectID);
+//            } catch (ClassNotFoundException e) {
+//                e.printStackTrace();
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//            }
             
         } catch (Exception e) {
             respondException(response, e);

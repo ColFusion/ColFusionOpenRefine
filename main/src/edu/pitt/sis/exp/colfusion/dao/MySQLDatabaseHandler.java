@@ -22,7 +22,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
 
     final static Logger logger = LoggerFactory.getLogger(MySQLDatabaseHandler.class.getName());
 
-    public MySQLDatabaseHandler(final DatabaseConnectionInfo databaseConnectionInfo) throws ClassNotFoundException {
+    public MySQLDatabaseHandler(DatabaseConnectionInfo databaseConnectionInfo) throws ClassNotFoundException {
         super(databaseConnectionInfo);// TODO Auto-generated constructor stub
 
         Class.forName("com.mysql.jdbc.Driver");
@@ -51,7 +51,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
     }
 
     @Override
-    public boolean tempTableExist(final int sid, final String tableName)
+    public boolean tempTableExist(int sid, String tableName)
             throws SQLException {
         logger.info(String.format("Getting if temp table exists for sid %d and tablename %s", sid, tableName));
 
@@ -82,7 +82,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
     }
 
     @Override
-    public void removeTable(final int sid, final String tableName)
+    public void removeTable(int sid, String tableName)
             throws SQLException {
         logger.info(String.format("Removing table for sid %d and tablename %s", sid, tableName));
 
@@ -106,7 +106,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
     }
 
     @Override
-    public void backupOriginalTable(final int sid, final String tableName)
+    public void backupOriginalTable(int sid, String tableName)
             throws SQLException {
 
         logger.info(String.format("Backing up table for sid %d and tablename %s", sid, tableName));
@@ -131,7 +131,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
     }
 
     @Override
-    public int getColCount(final int sid, final String tableName) throws SQLException {
+    public int getColCount(int sid, String tableName) throws SQLException {
         logger.info(String.format("Getting column count for sid %d", sid));
 
         try (Connection connection = getConnection()) {
@@ -161,7 +161,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
     }
     
     @Override
-    public ArrayList<ArrayList<String>> getRows(final String tableName, final int colCount) throws SQLException {
+    public ArrayList<ArrayList<String>> getRows(String tableName, int colCount) throws SQLException {
         logger.info(String.format("Getting rows for table %s", tableName));
         ArrayList<ArrayList<String>> rows = new ArrayList<ArrayList<String>>();
         try (Connection connection = getConnection()) {
@@ -193,7 +193,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
         }
     }
     @Override
-    public void createTable(final int sid, final String tableName)
+    public void createTable(int sid, String tableName)
             throws SQLException {
         logger.info(String.format("Creating table from temp_table for sid %d and tablename %s", sid, tableName));
 
@@ -212,6 +212,52 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
             }
         } catch (SQLException e) {
             logger.info(String.format("FAILED to Creating table from temp_table for sid %d and tablename %s", sid, tableName));
+            throw e;
+        }
+    }
+    
+    @Override
+    public void createTempTable(String query, int sid, String tableName)
+            throws SQLException {
+
+        logger.info(String.format("Creating temp table for sid %d and table %s", sid, tableName));
+
+        try (Connection connection = getConnection()) {
+
+            try (Statement statement = connection.createStatement()) {
+
+                statement.executeUpdate(query);
+
+            } catch (SQLException e) {
+                logger.error(String.format("Creating temp table for sid %d and table %s FAILED", sid, tableName), e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to Creating temp table for sid %d and table %s", sid, tableName));
+            throw e;
+        }
+    }
+    
+    @Override
+    public void insertIntoTempTable(String query, int sid, String tableName)
+            throws SQLException {
+
+        logger.info(String.format("Inserting into temp table temp_%s for sid %d", tableName, sid));
+
+        try (Connection connection = getConnection()) {
+
+            try (Statement statement = connection.createStatement()) {
+
+                statement.executeUpdate(query);
+
+            } catch (SQLException e) {
+                logger.error(String.format("Inserting into temp table temp_%s for sid %d FAILED", tableName, sid), e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to Inserting into temp table temp_%s for sid %d", tableName, sid));
             throw e;
         }
     }

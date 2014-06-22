@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package com.google.refine.commands.project;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +41,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.refine.ProjectMetadata;
 import com.google.refine.commands.Command;
-import com.google.refine.myDatabase.DatabaseOperation;
 
 
 
@@ -53,19 +51,19 @@ public class RenameProjectCommand extends Command {
         
         try {
             String name = request.getParameter("name");
-            String projectId = request.getParameter("project");// This is the project ID, in String format -- Alex
+//            String projectId = request.getParameter("project");// This is the project ID, in String format -- Alex
             ProjectMetadata pm = getProjectMetadata(request);
-            String oldname = pm.getName();
+//            String oldname = pm.getName();
             pm.setName(name);
             
             respond(response, "{ \"code\" : \"ok\" }");
-            try {
-                DatabaseOperation.databaseRenameUpdate(projectId, name, oldname);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                DatabaseOperation.databaseRenameUpdate(projectId, name, oldname);
+//            } catch (ClassNotFoundException e) {
+//                e.printStackTrace();
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//            }
         } catch (Exception e) {
             respondException(response, e);
         }

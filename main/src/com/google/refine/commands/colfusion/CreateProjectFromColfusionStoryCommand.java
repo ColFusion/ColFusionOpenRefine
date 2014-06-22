@@ -2,6 +2,7 @@
 package com.google.refine.commands.colfusion;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -20,15 +21,22 @@ import edu.pitt.sis.exp.colfusion.dao.MetadataDbHandler;
 import edu.pitt.sis.exp.colfusion.dao.TargetDatabaseHandlerFactory;
 
 /**
- * @author Xiaolong Xu
+ * @author xxl
  * 
  */
 public class CreateProjectFromColfusionStoryCommand extends Command {
 
     @Override
-    public void doGet(final HttpServletRequest request, final HttpServletResponse response)
-            throws ServletException, IOException {
-
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        
+        Properties p = new Properties();
+        String fileName="/ColFusionOpenRefine.properties";
+        InputStream in = CreateProjectFromColfusionStoryCommand.class.getResourceAsStream(fileName);
+        p.load(in);  
+        in.close();
+        
+        int lockTime = Integer.valueOf(p.getProperty("lock_time"));
+        
         Properties parameters = ParsingUtilities.parseUrlParameters(request);
         /*
          * Get "sid" and "tableName" from "request"
@@ -50,7 +58,7 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
     
             if (isTableLocked) {
                 isEditingByCurrentUser = metadataDbHandler.isBeingEditedByCurrentUser(sid, tableName, userId);
-                if (metadataDbHandler.isTimeOut(sid, tableName, 30)) {
+                if (metadataDbHandler.isTimeOut(sid, tableName, lockTime)) {
                     isTimeOut = true;
                     metadataDbHandler.releaseTableLock(sid, tableName);
                 }
@@ -83,8 +91,8 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
-        } 
-    }
+    
+        }}
+    
 
 }

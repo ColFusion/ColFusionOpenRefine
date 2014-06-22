@@ -18,10 +18,14 @@ import com.google.refine.util.ParsingUtilities;
 import edu.pitt.sis.exp.colfusion.dao.MetadataDbHandler;
 import edu.pitt.sis.exp.colfusion.dao.TargetDatabaseHandlerFactory;
 
+/**
+ * @author xxl
+ *
+ */
 public class ReleaseTableCommand extends Command {
 
     @Override
-    public void doGet(final HttpServletRequest request, final HttpServletResponse response)
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
         Properties parameters = ParsingUtilities.parseUrlParameters(request);

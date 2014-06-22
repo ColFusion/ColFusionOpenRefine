@@ -42,9 +42,9 @@ import java.util.ArrayList;
  *
  */
 public abstract class DatabaseHandler {
-    protected final DatabaseConnectionInfo databaseConnectionInfo;
+    protected DatabaseConnectionInfo databaseConnectionInfo;
     
-    public DatabaseHandler(final DatabaseConnectionInfo databaseConnectionInfo){
+    public DatabaseHandler(DatabaseConnectionInfo databaseConnectionInfo){
        this.databaseConnectionInfo = databaseConnectionInfo;
     }
 
@@ -52,15 +52,19 @@ public abstract class DatabaseHandler {
     
     protected abstract String getConnectionString();
     
-    public abstract boolean tempTableExist(final int sid, final String tableName)  throws SQLException;
+    public abstract boolean tempTableExist(int sid, String tableName)  throws SQLException;
     
-    public abstract void removeTable(final int sid, final String tableName) throws SQLException;
+    public abstract void removeTable(int sid, String tableName) throws SQLException;
     
-    public abstract void backupOriginalTable(final int sid, final String tableName) throws SQLException;
+    public abstract void backupOriginalTable(int sid, String tableName) throws SQLException;
     
-    public abstract int getColCount(final int sid, final String tableName) throws SQLException;
+    public abstract int getColCount(int sid, String tableName) throws SQLException;
     
-    public abstract ArrayList<ArrayList<String>> getRows(final String tableName, final int colCount) throws SQLException;
+    public abstract ArrayList<ArrayList<String>> getRows(String tableName, int colCount) throws SQLException;
     
-    public abstract void createTable(final int sid, final String tableName) throws SQLException;
+    public abstract void createTable(int sid, String tableName) throws SQLException;
+    
+    public abstract void createTempTable(String query, int sid, String tableName) throws SQLException;
+    
+    public abstract void insertIntoTempTable(String query, int sid, String tableName) throws SQLException;
 }

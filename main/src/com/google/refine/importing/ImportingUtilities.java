@@ -44,7 +44,6 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -88,7 +87,6 @@ import com.google.refine.RefineServlet;
 import com.google.refine.importing.ImportingManager.Format;
 import com.google.refine.importing.UrlRewriter.Result;
 import com.google.refine.model.Project;
-import com.google.refine.myDatabase.DatabaseOperation;
 import com.google.refine.util.JSONUtilities;
 
 public class ImportingUtilities {
@@ -100,11 +98,11 @@ public class ImportingUtilities {
     }
     
     static public void loadDataAndPrepareJob(
-        final HttpServletRequest request,
-        final HttpServletResponse response,
-        final Properties parameters,
+        HttpServletRequest request,
+        HttpServletResponse response,
+        Properties parameters,
         final ImportingJob job,
-        final JSONObject config) throws IOException, ServletException {
+        JSONObject config) throws IOException, ServletException {
         
         JSONObject retrievalRecord = new JSONObject();
         JSONUtilities.safePut(config, "retrievalRecord", retrievalRecord);
@@ -120,7 +118,7 @@ public class ImportingUtilities {
                 retrievalRecord,
                 new Progress() {
                     @Override
-                    public void setProgress(final String message, final int percent) {
+                    public void setProgress(String message, int percent) {
                         if (message != null) {
                             JSONUtilities.safePut(progress, "message", message);
                         }
@@ -154,7 +152,7 @@ public class ImportingUtilities {
         config.remove("progress");
     }
     
-    static public void updateJobWithNewFileSelection(final ImportingJob job, final JSONArray fileSelectionArray) {
+    static public void updateJobWithNewFileSelection(ImportingJob job, JSONArray fileSelectionArray) {
         job.setFileSelection(fileSelectionArray);
         
         String bestFormat = ImportingUtilities.getCommonFormatForSelectedFiles(job, fileSelectionArray);
@@ -166,10 +164,10 @@ public class ImportingUtilities {
     }
     
     static public void retrieveContentFromPostRequest(
-        final HttpServletRequest request,
-        final Properties parameters,
-        final File rawDataDir,
-        final JSONObject retrievalRecord,
+        HttpServletRequest request,
+        Properties parameters,
+        File rawDataDir,
+        JSONObject retrievalRecord,
         final Progress progress
     ) throws Exception {
         JSONArray fileRecords = new JSONArray();
@@ -201,7 +199,7 @@ public class ImportingUtilities {
             long lastBytesRead = 0;
             
             @Override
-            public void update(final long bytesRead, final long contentLength, final int itemCount) {
+            public void update(long bytesRead, long contentLength, int itemCount) {
                 if (!setContentLength) {
                     // Only try to set the content length if we really know it.
                     if (contentLength >= 0) {
@@ -219,7 +217,7 @@ public class ImportingUtilities {
         });
 
         @SuppressWarnings("unchecked")
-        List<FileItem> tempFiles = upload.parseRequest(request);
+        List<FileItem> tempFiles = (List<FileItem>)upload.parseRequest(request);
         
         progress.setProgress("Uploading data ...", -1);
         parts: for (FileItem fileItem : tempFiles) {
@@ -399,8 +397,8 @@ public class ImportingUtilities {
         JSONUtilities.safePut(retrievalRecord, "archiveCount", archiveCount);
     }
 
-    private static boolean saveStream(final InputStream stream, final URL url, final File rawDataDir, final Progress progress,
-            final SavingUpdate update, final JSONObject fileRecord, final JSONArray fileRecords, final long length)
+    private static boolean saveStream(InputStream stream, URL url, File rawDataDir, final Progress progress,
+            final SavingUpdate update, JSONObject fileRecord, JSONArray fileRecords, long length)
             throws IOException, Exception {
         String localname = url.getPath();
         if (localname.isEmpty() || localname.endsWith("/")) {
@@ -430,12 +428,12 @@ public class ImportingUtilities {
         return postProcessRetrievedFile(rawDataDir, file, fileRecord, fileRecords, progress);
     }
     
-    static public String getRelativePath(final File file, final File dir) {
+    static public String getRelativePath(File file, File dir) {
         String location = file.getAbsolutePath().substring(dir.getAbsolutePath().length());
         return (location.startsWith(File.separator)) ? location.substring(1) : location;
     }
     
-    static public File allocateFile(final File dir, String name) {
+    static public File allocateFile(File dir, String name) {
         int q = name.indexOf('?');
         if (q > 0) {
             name = name.substring(0, q);
@@ -456,17 +454,17 @@ public class ImportingUtilities {
         return file;
     }
     
-    static public Reader getFileReader(final ImportingJob job, final JSONObject fileRecord, final String commonEncoding)
+    static public Reader getFileReader(ImportingJob job, JSONObject fileRecord, String commonEncoding)
         throws FileNotFoundException {
         
         return getFileReader(getFile(job, JSONUtilities.getString(fileRecord, "location", "")), fileRecord, commonEncoding);
     }
     
-    static public Reader getFileReader(final File file, final JSONObject fileRecord, final String commonEncoding) throws FileNotFoundException {
+    static public Reader getFileReader(File file, JSONObject fileRecord, String commonEncoding) throws FileNotFoundException {
         return getReaderFromStream(new FileInputStream(file), fileRecord, commonEncoding);
     }
     
-    static public Reader getReaderFromStream(final InputStream inputStream, final JSONObject fileRecord, final String commonEncoding) {
+    static public Reader getReaderFromStream(InputStream inputStream, JSONObject fileRecord, String commonEncoding) {
         String encoding = getEncoding(fileRecord);
         if (encoding == null) {
             encoding = commonEncoding;
@@ -481,15 +479,15 @@ public class ImportingUtilities {
         return new InputStreamReader(inputStream);
     }
     
-    static public File getFile(final ImportingJob job, final JSONObject fileRecord) {
+    static public File getFile(ImportingJob job, JSONObject fileRecord) {
         return getFile(job, JSONUtilities.getString(fileRecord, "location", ""));
     }
     
-    static public File getFile(final ImportingJob job, final String location) {
+    static public File getFile(ImportingJob job, String location) {
         return new File(job.getRawDataDir(), location);
     }
     
-    static public String getFileSource(final JSONObject fileRecord) {
+    static public String getFileSource(JSONObject fileRecord) {
         return JSONUtilities.getString(
             fileRecord,
             "url",
@@ -504,7 +502,7 @@ public class ImportingUtilities {
         abstract public void savedMore();
         abstract public boolean isCanceled();
     }
-    static public long saveStreamToFile(final InputStream stream, final File file, final SavingUpdate update) throws IOException {
+    static public long saveStreamToFile(InputStream stream, File file, SavingUpdate update) throws IOException {
         long length = 0;
         FileOutputStream fos = new FileOutputStream(file);
         try {
@@ -526,7 +524,7 @@ public class ImportingUtilities {
     }
     
     static public boolean postProcessRetrievedFile(
-            final File rawDataDir, File file, final JSONObject fileRecord, final JSONArray fileRecords, final Progress progress) {
+            File rawDataDir, File file, JSONObject fileRecord, JSONArray fileRecords, final Progress progress) {
         
         String mimeType = JSONUtilities.getString(fileRecord, "declaredMimeType", null);
         String contentEncoding = JSONUtilities.getString(fileRecord, "declaredEncoding", null);
@@ -572,7 +570,7 @@ public class ImportingUtilities {
         return false;
     }
     
-    static public void postProcessSingleRetrievedFile(final File file, final JSONObject fileRecord) {
+    static public void postProcessSingleRetrievedFile(File file, JSONObject fileRecord) {
         if (!fileRecord.has("format")) {
             JSONUtilities.safePut(fileRecord, "format",
                 ImportingManager.getFormat(
@@ -581,11 +579,11 @@ public class ImportingUtilities {
         }
     }
     
-    static public InputStream tryOpenAsArchive(final File file, final String mimeType) {
+    static public InputStream tryOpenAsArchive(File file, String mimeType) {
         return tryOpenAsArchive(file, mimeType, null);
     }
     
-    static public InputStream tryOpenAsArchive(final File file, final String mimeType, final String contentType) {
+    static public InputStream tryOpenAsArchive(File file, String mimeType, String contentType) {
         String fileName = file.getName();
         try {
             if (fileName.endsWith(".tar.gz") || fileName.endsWith(".tgz")) {
@@ -609,10 +607,10 @@ public class ImportingUtilities {
     }
     
     static public boolean explodeArchive(
-        final File rawDataDir,
-        final InputStream archiveIS,
-        final JSONObject archiveFileRecord,
-        final JSONArray fileRecords,
+        File rawDataDir,
+        InputStream archiveIS,
+        JSONObject archiveFileRecord,
+        JSONArray fileRecords,
         final Progress progress
     ) {
         if (archiveIS instanceof TarInputStream) {
@@ -679,11 +677,11 @@ public class ImportingUtilities {
         return false;
     }
     
-    static public InputStream tryOpenAsCompressedFile(final File file, final String mimeType) {
+    static public InputStream tryOpenAsCompressedFile(File file, String mimeType) {
         return tryOpenAsCompressedFile(file, mimeType, null);
     }
     
-    static public InputStream tryOpenAsCompressedFile(final File file, final String mimeType, final String contentEncoding) {
+    static public InputStream tryOpenAsCompressedFile(File file, String mimeType, String contentEncoding) {
         String fileName = file.getName();
         try {
             if (fileName.endsWith(".gz") 
@@ -708,9 +706,9 @@ public class ImportingUtilities {
     }
     
     static public File uncompressFile(
-        final File rawDataDir,
-        final InputStream uncompressedIS,
-        final JSONObject fileRecord,
+        File rawDataDir,
+        InputStream uncompressedIS,
+        JSONObject fileRecord,
         final Progress progress
     ) throws IOException {
         String fileName = JSONUtilities.getString(fileRecord, "location", "unknown");
@@ -733,15 +731,15 @@ public class ImportingUtilities {
         return file2;
     }
     
-    static private int calculateProgressPercent(final long totalExpectedSize, final long totalRetrievedSize) {
+    static private int calculateProgressPercent(long totalExpectedSize, long totalRetrievedSize) {
         return totalExpectedSize == 0 ? -1 : (int) (totalRetrievedSize * 100 / totalExpectedSize);
     }
     
-    static private String formatBytes(final long bytes) {
+    static private String formatBytes(long bytes) {
         return NumberFormat.getIntegerInstance().format(bytes);
     }
     
-    static public String getEncoding(final JSONObject fileRecord) {
+    static public String getEncoding(JSONObject fileRecord) {
         String encoding = JSONUtilities.getString(fileRecord, "encoding", null);
         if (encoding == null || encoding.isEmpty()) {
             encoding = JSONUtilities.getString(fileRecord, "declaredEncoding", null);
@@ -758,7 +756,7 @@ public class ImportingUtilities {
      * @param fileSelectionIndexes JSON array of selected file indices matching best format
      * @return best (highest frequency) format
      */
-    static public String autoSelectFiles(final ImportingJob job, final JSONObject retrievalRecord, final JSONArray fileSelectionIndexes) {
+    static public String autoSelectFiles(ImportingJob job, JSONObject retrievalRecord, JSONArray fileSelectionIndexes) {
         final Map<String, Integer> formatToCount = new HashMap<String, Integer>();
         List<String> formats = new ArrayList<String>();
         
@@ -778,7 +776,7 @@ public class ImportingUtilities {
         }
         Collections.sort(formats, new Comparator<String>() {
             @Override
-            public int compare(final String o1, final String o2) {
+            public int compare(String o1, String o2) {
                 return formatToCount.get(o2) - formatToCount.get(o1);
             }
         });
@@ -811,7 +809,7 @@ public class ImportingUtilities {
         return bestFormat;
     }
     
-    static public String getCommonFormatForSelectedFiles(final ImportingJob job, final JSONArray fileSelectionIndexes) {
+    static public String getCommonFormatForSelectedFiles(ImportingJob job, JSONArray fileSelectionIndexes) {
         JSONObject retrievalRecord = job.getRetrievalRecord();
         
         final Map<String, Integer> formatToCount = new HashMap<String, Integer>();
@@ -836,7 +834,7 @@ public class ImportingUtilities {
         }
         Collections.sort(formats, new Comparator<String>() {
             @Override
-            public int compare(final String o1, final String o2) {
+            public int compare(String o1, String o2) {
                 return formatToCount.get(o2) - formatToCount.get(o1);
             }
         });
@@ -844,17 +842,17 @@ public class ImportingUtilities {
         return formats.size() > 0 ? formats.get(0) : null;
     }
     
-    static String guessBetterFormat(final ImportingJob job, final String bestFormat) {
+    static String guessBetterFormat(ImportingJob job, String bestFormat) {
         JSONObject retrievalRecord = job.getRetrievalRecord();
         return retrievalRecord != null ? guessBetterFormat(job, retrievalRecord, bestFormat) : bestFormat;
     }
     
-    static String guessBetterFormat(final ImportingJob job, final JSONObject retrievalRecord, final String bestFormat) {
+    static String guessBetterFormat(ImportingJob job, JSONObject retrievalRecord, String bestFormat) {
         JSONArray fileRecords = JSONUtilities.getArray(retrievalRecord, "files");
         return fileRecords != null ? guessBetterFormat(job, fileRecords, bestFormat) : bestFormat;
     }
     
-    static String guessBetterFormat(final ImportingJob job, final JSONArray fileRecords, String bestFormat) {
+    static String guessBetterFormat(ImportingJob job, JSONArray fileRecords, String bestFormat) {
         if (bestFormat != null && fileRecords != null && fileRecords.length() > 0) {
             JSONObject firstFileRecord = JSONUtilities.getObjectElement(fileRecords, 0);
             String encoding = getEncoding(firstFileRecord);
@@ -887,7 +885,7 @@ public class ImportingUtilities {
         return bestFormat;
     }
     
-    static void rankFormats(final ImportingJob job, final String bestFormat, final JSONArray rankedFormats) {
+    static void rankFormats(ImportingJob job, final String bestFormat, JSONArray rankedFormats) {
         final Map<String, String[]> formatToSegments = new HashMap<String, String[]>();
         
         boolean download = bestFormat == null ? true :
@@ -907,7 +905,7 @@ public class ImportingUtilities {
         } else {
             Collections.sort(formats, new Comparator<String>() {
                 @Override
-                public int compare(final String format1, final String format2) {
+                public int compare(String format1, String format2) {
                     if (format1.equals(bestFormat)) {
                         return -1;
                     } else if (format2.equals(bestFormat)) {
@@ -917,12 +915,12 @@ public class ImportingUtilities {
                     }
                 }
                 
-                int compareBySegments(final String format1, final String format2) {
+                int compareBySegments(String format1, String format2) {
                     int c = commonSegments(format2) - commonSegments(format1);
                     return c != 0 ? c : format1.compareTo(format2);
                 }
                 
-                int commonSegments(final String format) {
+                int commonSegments(String format) {
                     String[] bestSegments = formatToSegments.get(bestFormat);
                     String[] segments = formatToSegments.get(format);
                     if (bestSegments == null || segments == null) {
@@ -946,7 +944,7 @@ public class ImportingUtilities {
     }
 
     
-    static public void previewParse(final ImportingJob job, final String format, final JSONObject optionObj, final List<Exception> exceptions) {
+    static public void previewParse(ImportingJob job, String format, JSONObject optionObj, List<Exception> exceptions) {
         Format record = ImportingManager.formatToRecord.get(format);
         if (record == null || record.parser == null) {
             // TODO: what to do?
@@ -974,7 +972,7 @@ public class ImportingUtilities {
             final String format,
             final JSONObject optionObj,
             final List<Exception> exceptions,
-            final boolean synchronous) {
+            boolean synchronous) {
         // JOptionPane.showMessageDialog(null, "I found you!!!", "Yoo~ Man~", JOptionPane.WARNING_MESSAGE); // Alex
         final Format record = ImportingManager.formatToRecord.get(format);
         if (record == null || record.parser == null) {
@@ -1042,13 +1040,13 @@ public class ImportingUtilities {
             job.touch();
             job.updating = false;
         }
-        try {
-            DatabaseOperation.databaseTableInput(DatabaseOperation.getReorderedRows(project),project.columnModel.columns,project.getMetadata().getName(),project.id);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            DatabaseOperation.databaseTableInput(DatabaseOperation.getReorderedRows(project),project.columnModel.columns,project.getMetadata().getName(),project.id);
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
     }
     
 

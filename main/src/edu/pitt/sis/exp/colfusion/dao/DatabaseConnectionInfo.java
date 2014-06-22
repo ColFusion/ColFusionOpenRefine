@@ -1,14 +1,17 @@
 package edu.pitt.sis.exp.colfusion.dao;
-
+/**
+ * @author xxl
+ *
+ */
 public class DatabaseConnectionInfo {
-    private final String host;
-    private final int port;
-    private final String user;
-    private final String password;
-    private final String database;
+    private String host;
+    private int port;
+    private String user;
+    private String password;
+    private String database;
     
-    public DatabaseConnectionInfo(final String host, final int port, final String user, final String password,
-            final String database){
+    public DatabaseConnectionInfo(String host, int port, String user, String password,
+            String database){
         this.host = host;
         this.port = port;
         this.user = user;

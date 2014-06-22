@@ -53,15 +53,15 @@ import org.slf4j.LoggerFactory;
  */
 public class MetadataDbHandler {
 
-    private final DatabaseHandler dbHandler;
+    private DatabaseHandler dbHandler;
 
     final static Logger logger = LoggerFactory.getLogger(MetadataDbHandler.class.getName());
 
-    public MetadataDbHandler(final DatabaseHandler dbHandler) {
+    public MetadataDbHandler(DatabaseHandler dbHandler) {
         this.dbHandler = dbHandler;
     }
 
-    public DatabaseConnectionInfo getTargetDbConnectionInfo(final int sid)
+    public DatabaseConnectionInfo getTargetDbConnectionInfo(int sid)
             throws SQLException {
         logger.info(String.format("Getting target database connectio info for sid %d", sid));
 
@@ -101,7 +101,7 @@ public class MetadataDbHandler {
      * @return
      * @throws SQLException
      */
-    public int getOperatingUserId(final int sid, final String tableName)
+    public int getOperatingUserId(int sid, String tableName)
             throws SQLException {
         logger.info(String.format("Getting operating user id for sid %d and table name %s", sid, tableName));
 
@@ -137,7 +137,7 @@ public class MetadataDbHandler {
         }
     }
 
-    public String getUserLoginById(final int userId)
+    public String getUserLoginById(int userId)
             throws SQLException {
 
         logger.info(String.format("Getting user login for userId %d", userId));
@@ -168,7 +168,7 @@ public class MetadataDbHandler {
 
     }
 
-    public boolean isBeingEditedByCurrentUser(final int sid, final String tableName, final int userId)
+    public boolean isBeingEditedByCurrentUser(int sid, String tableName, int userId)
             throws SQLException {
 
         logger.info(String.format("Getting if current table is being edited by user %d", userId));
@@ -201,7 +201,7 @@ public class MetadataDbHandler {
         }
     }
 
-    public void releaseTableLock(final int sid, final String tableName)
+    public void releaseTableLock(int sid, String tableName)
             throws SQLException {
         logger.info(String.format("Releasing table for sid %d and table %s", sid, tableName));
 
@@ -229,7 +229,7 @@ public class MetadataDbHandler {
         }
     }
 
-    public boolean isTimeOut(final int sid, final String tableName, final int allowedTime)
+    public boolean isTimeOut(int sid, String tableName, int allowedTime)
             throws SQLException {
         logger.info(String.format("Getting if it is timeout for sid %d and table %s", sid, tableName));
 
@@ -269,7 +269,7 @@ public class MetadataDbHandler {
         }
     }
     
-    public boolean isTimeOutForCurrentUser(final int sid, final String tableName, final int colfusionUserId, final int allowedTime)
+    public boolean isTimeOutForCurrentUser(int sid, String tableName, int colfusionUserId, int allowedTime)
             throws SQLException {
         logger.info(String.format("Getting if it is timeout for sid %d and table %s", sid, tableName));
 
@@ -308,7 +308,7 @@ public class MetadataDbHandler {
     }
     
 
-    public boolean isTimeOutHelper(final String currentTime, String startTime, final int allowedTime) {
+    public boolean isTimeOutHelper(String currentTime, String startTime, int allowedTime) {
         if (!currentTime.split(" ")[0].equals(startTime.split(" ")[0])) {
             return true;
         }
@@ -344,7 +344,7 @@ public class MetadataDbHandler {
         return false;
     }
 
-    public void createEditLog(final int sid, final String tableName, final int userId)
+    public void createEditLog(int sid, String tableName, int userId)
             throws SQLException {
         logger.info(String.format("Creating edit log for sid %d, table %s and user %d", sid, tableName, userId));
 
@@ -373,7 +373,7 @@ public class MetadataDbHandler {
         }
     }
 
-    public boolean isTableLocked(final int sid, final String tableName)
+    public boolean isTableLocked(int sid, String tableName)
             throws SQLException {
 
         logger.info(String.format("Getting if table locked for sid %d, table %s", sid, tableName));
@@ -405,7 +405,7 @@ public class MetadataDbHandler {
         }
     }
 
-    public boolean isMapExist(final int sid, final String tableName)
+    public boolean isMapExist(int sid, String tableName)
             throws SQLException {
         logger.info(String.format("Getting if map exists for sid %d, table %s", sid, tableName));
         try (Connection connection = dbHandler.getConnection()) {
@@ -435,7 +435,7 @@ public class MetadataDbHandler {
         }
     }
 
-    public String getProjectId(final int sid, final String tableName)
+    public String getProjectId(int sid, String tableName)
             throws SQLException {
         logger.info(String.format("Getting projectId for sid %d, table %s", sid, tableName));
         String projectId = "";
@@ -465,7 +465,7 @@ public class MetadataDbHandler {
         }
     }
 
-    public boolean isTableBeingEditing(final int sid, final String tableName)
+    public boolean isTableBeingEditing(int sid, String tableName)
             throws SQLException {
         logger.info(String.format("Getting if table is being edited for sid %d, table %s", sid, tableName));
         try (Connection connection = dbHandler.getConnection()) {
@@ -499,7 +499,7 @@ public class MetadataDbHandler {
         }
     }
 
-    public void saveRelation(final long projectId, final int sid, final String tableName)
+    public void saveRelation(long projectId, int sid, String tableName)
             throws SQLException {
         logger.info(String.format("Saving relation for project %d, sid %d and tablename %s", projectId, sid, tableName));
 
@@ -526,7 +526,7 @@ public class MetadataDbHandler {
         }
     }
 
-    public ArrayList<String> getColumnNames(final int sid)
+    public ArrayList<String> getColumnNames(int sid)
             throws SQLException {
         logger.info(String.format("Getting column names for sid %d", sid));
         ArrayList<String> columnNames = new ArrayList<String>();
@@ -554,7 +554,7 @@ public class MetadataDbHandler {
         }
     }
 
-    public String getTableName(final int sid)
+    public String getTableName(int sid)
             throws SQLException {
         logger.info(String.format("Getting tableName for sid %d", sid));
 
@@ -582,7 +582,7 @@ public class MetadataDbHandler {
         }
     }
 
-    public boolean isInCurrentUserSession(final int sid, final String tableName, final int colfusionUserId)
+    public boolean isInCurrentUserSession(int sid, String tableName, int colfusionUserId)
             throws SQLException {
         logger.info(String.format("Getting if still in the session for sid %d, tableName %s and user %d", sid, tableName, colfusionUserId));
         
@@ -613,7 +613,7 @@ public class MetadataDbHandler {
         }
     }
     
-    public int getSid(final String projectId) throws SQLException {
+    public int getSid(String projectId) throws SQLException {
         logger.info(String.format("Getting sid for project %s", projectId));
         
         try (Connection connection = dbHandler.getConnection()) {
@@ -644,7 +644,7 @@ public class MetadataDbHandler {
         }
     }
     
-    public String getTableNameByProjectId(final String projectId) throws SQLException {
+    public String getTableNameByProjectId(String projectId) throws SQLException {
         logger.info(String.format("Getting tableName for project %s", projectId));
 
         try (Connection connection = dbHandler.getConnection()) {
@@ -667,6 +667,157 @@ public class MetadataDbHandler {
             }
         } catch (SQLException e) {
             logger.info(String.format("FAILED to getting tableName for project %s", projectId));
+            throw e;
+        }
+    }
+    
+    public void refreshStartTime(int sid, String tableName)
+            throws SQLException {
+        logger.info(String.format("Refreshing startTime for sid %d and tablename %s", sid, tableName));
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String currentTime = format.format(new Date());
+        
+        try (Connection connection = dbHandler.getConnection()) {
+
+            String sql = String.format("UPDATE colfusion_table_change_log SET startChangeTime = '%s' WHERE endChangeTime IS NULL and sid = %d and tableName = '%s'", currentTime, sid, tableName);
+
+            try (Statement statement = connection.createStatement()) {
+
+                statement.executeUpdate(sql);
+
+            } catch (SQLException e) {
+                logger.error(
+                        String.format("Refreshing startTime for sid %d and tablename %s FAILED", sid, tableName),
+                        e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to Refreshing startTime for sid %d and tablename %s", sid,
+                    tableName));
+            throw e;
+        }
+    }
+    
+    public ArrayList<Integer> getCidsBySid(int sid) throws SQLException {
+        logger.info(String.format("Getting cids for sid %d", sid));
+        ArrayList<Integer> cids = new ArrayList<>();
+        
+        try (Connection connection = dbHandler.getConnection()) {
+
+            String sql = String.format("SELECT cid FROM colfusion_dnameinfo WHERE sid = %d", sid);
+
+            try (Statement statement = connection.createStatement()) {
+
+                ResultSet rs = statement.executeQuery(sql);
+                while(rs.next()) {
+                    cids.add(rs.getInt("cid"));
+                }
+                return cids;
+            } catch (SQLException e) {
+                logger.error(
+                        String.format("Getting cids for sid %d FAILED", sid),
+                        e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to Getting cids for sid %d", sid));
+            throw e;
+        }
+    }
+    
+    public void deleteDnameinfoRowsBySid(int sid)
+            throws SQLException {
+        logger.info(String.format("Deleting dnameinfo rows by sid %d", sid));
+        
+        try (Connection connection = dbHandler.getConnection()) {
+
+            String sql = String.format("DELETE FROM colfusion_dnameinfo WHERE sid = %d", sid);
+
+            try (Statement statement = connection.createStatement()) {
+
+                statement.executeUpdate(sql);
+
+            } catch (SQLException e) {
+                logger.error(
+                        String.format("Deleting dnameinfo rows by sid %d FAILED", sid),
+                        e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to Deleting dnameinfo rows by sid %d", sid));
+            throw e;
+        }
+    }
+    
+    public void insertIntoDnameinfo(String query, int sid)
+            throws SQLException {
+        logger.info(String.format("Inserting into dnameinfo by sid %d", sid));
+        
+        try (Connection connection = dbHandler.getConnection()) {
+
+            try (Statement statement = connection.createStatement()) {
+
+                statement.executeUpdate(query);
+
+            } catch (SQLException e) {
+                logger.error(
+                        String.format("Inserting into dnameinfo by sid %d FAILED", sid),
+                        e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to Inserting into dnameinfo by sid %d", sid));
+            throw e;
+        }
+    }
+    
+    public void deleteColumninfoRowsByCid(String query, int cid)
+            throws SQLException {
+        logger.info(String.format("Deleting row from columninfo for cid %d", cid));
+        
+        try (Connection connection = dbHandler.getConnection()) {
+
+            try (Statement statement = connection.createStatement()) {
+
+                statement.executeUpdate(query);
+
+            } catch (SQLException e) {
+                logger.error(
+                        String.format("Deleting row from columninfo for cid %d FAILED", cid),
+                        e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to Deleting row from columninfo for cid %d", cid));
+            throw e;
+        }
+    }
+    
+    public void insertIntoColumninfo(String query, String tableName)
+            throws SQLException {
+        logger.info(String.format("Inserting into columninfo by table %s", tableName));
+        
+        try (Connection connection = dbHandler.getConnection()) {
+
+            try (Statement statement = connection.createStatement()) {
+
+                statement.executeUpdate(query);
+
+            } catch (SQLException e) {
+                logger.error(
+                        String.format("Inserting into columninfo by table %s FAILED", tableName),
+                        e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to Inserting into columninfo by table %s", tableName));
             throw e;
         }
     }

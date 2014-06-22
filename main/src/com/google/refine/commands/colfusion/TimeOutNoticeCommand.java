@@ -1,6 +1,7 @@
 package com.google.refine.commands.colfusion;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -17,12 +18,23 @@ import com.google.refine.util.ParsingUtilities;
 import edu.pitt.sis.exp.colfusion.dao.MetadataDbHandler;
 import edu.pitt.sis.exp.colfusion.dao.TargetDatabaseHandlerFactory;
 
-
+/**
+ * @author xxl
+ *
+ */
 public class TimeOutNoticeCommand extends Command {
     @Override
-    public void doGet(final HttpServletRequest request, final HttpServletResponse response)
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
 
+        Properties p = new Properties();
+        String fileName="/ColFusionOpenRefine.properties";
+        InputStream in = TimeOutNoticeCommand.class.getResourceAsStream(fileName);
+        p.load(in);  
+        in.close();
+        
+        int noticeTime = Integer.valueOf(p.getProperty("notice_time"));
+        
         Properties parameters = ParsingUtilities.parseUrlParameters(request);
 
         int sid = Integer.valueOf(parameters.getProperty("sid"));
@@ -35,7 +47,7 @@ public class TimeOutNoticeCommand extends Command {
 
         try {
             boolean isTimeOuting = false;
-            if(metadataDbHandler.isTimeOut(sid, tableName, 25)) {
+            if(metadataDbHandler.isTimeOut(sid, tableName, noticeTime)) {
                 isTimeOuting = true;
             }
             result.put("isTableLocked", metadataDbHandler.isTableLocked(sid, tableName));

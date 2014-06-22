@@ -34,8 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package edu.pitt.sis.exp.colfusion;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import com.google.refine.ProjectManager;
 import com.google.refine.ProjectMetadata;
@@ -56,11 +59,20 @@ import edu.pitt.sis.exp.colfusion.dao.TargetDatabaseHandlerFactory;
  */
 public class ColFusionOpenRefineProjectManager {
 
-    public String createProjectToOpenRefine(final int sid, final String tableName)
-            throws ClassNotFoundException, SQLException {
+    
+    public String createProjectToOpenRefine(int sid, String tableName)
+            throws ClassNotFoundException, SQLException, IOException {
         ProjectManager.singleton.setBusy(true);
         String url = "";
 
+        Properties p = new Properties();
+        String fileName="/ColFusionOpenRefine.properties";
+        InputStream in = ColFusionOpenRefineProjectManager.class.getResourceAsStream(fileName);
+        p.load(in);  
+        in.close();
+        
+        String fileDir = p.getProperty("file_dir");
+        
         // DatabaseConnectionInfo databaseConnectionInfo = new
         // DatabaseConnectionInfo("127.0.0.1", 3306, "root", "",
         // "colfusion_filetodb_")
@@ -96,8 +108,9 @@ public class ColFusionOpenRefineProjectManager {
 
               //  dataDir); //   String dataDir = Configurations.get("refine.data_dir");
 
-                File dir = new File("C:\\Users\\xxl\\AppData\\Roaming\\OpenRefine");
+                File dir = new File(fileDir);
 
+                
                 FileProjectManager.initialize(dir);
 
                 project.update();
@@ -135,8 +148,8 @@ public class ColFusionOpenRefineProjectManager {
         return url;
     }
 
-    private void setProject(final int sid, final Project project, final DatabaseHandler dbHandler,
-            final MetadataDbHandler metadataDbHandler)
+    private void setProject(int sid, Project project, DatabaseHandler dbHandler,
+            MetadataDbHandler metadataDbHandler)
             throws SQLException {
         // Get and set column names
 
@@ -150,7 +163,7 @@ public class ColFusionOpenRefineProjectManager {
         setProjectRow(project, dbHandler.getRows(tableName, colCount));
     }
 
-    public static void setProjectCol(final Project project, final ArrayList<String> columnNames) {
+    public static void setProjectCol(Project project, ArrayList<String> columnNames) {
         for (int i = 0; i < columnNames.size(); i++) {
             Column column = new Column(i, columnNames.get(i));
             try {
@@ -161,7 +174,7 @@ public class ColFusionOpenRefineProjectManager {
         }
     }
 
-    public static void setProjectRow(final Project project, final ArrayList<ArrayList<String>> rows) {
+    public static void setProjectRow(Project project, ArrayList<ArrayList<String>> rows) {
         for (int j = 0; j < rows.size(); j++) {
             Row row = new Row(rows.get(j).size());
             for (int k = 0; k < rows.get(j).size(); k++) {
