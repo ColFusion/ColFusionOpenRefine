@@ -47,11 +47,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   </head>
   <body>
     <div id="header">
-      <a id="app-home-button" href="http://openrefine.org/" target="_blank"><img alt="OpenRefine" src="images/logo-openrefine-30.png" width="129" height="29" /></a>
-      <div id="project-title">
-        <span id="project-name-button" class="app-path-section"></span>
-        <a id="project-permalink-button" href="javascript:{}" class="secondary"></a>
-      </div>
+      <table>
+        <tbody><tr>
+          <td><span style="font-size:18pt; color: #0E6D9E;font-weight: bold; font-style: italic;font-family: sans-serif;">Col*Fusion Edit</span><span style="font-size:10pt; color: #0E6D9E;font-weight: bold; font-style: italic;font-family: sans-serif;"> powered by </span></td>
+          <td style="
+    width: 130px;
+"><a id="app-home-button" href="http://openrefine.org/" target="_blank"><img alt="OpenRefine" src="images/logo-openrefine-30.png" width="129" height="29"></a></td>
+          <td><div id="project-title" style="display: block;">
+        <span id="project-name-button" class="app-path-section" title="Click to rename project">Sheet1</span>
+        <a id="project-permalink-button" style="display:none" href="javascript:{}" class="secondary">Permalink</a>
+      </div></td>
+        </tr>
+      </tbody></table>
+      
+      
+      
       <div id="project-controls">
 
         

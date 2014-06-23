@@ -104,7 +104,7 @@ public class ColFusionOpenRefineProjectManager {
 
                 ppm.setName(tableName);
                 ppm.setEncoding("UTF-8");
-                setProject(sid, project, databaseHandler, metadataDbHandler);
+                this.setProject(sid, project, databaseHandler, metadataDbHandler);
 
               //  dataDir); //   String dataDir = Configurations.get("refine.data_dir");
 
