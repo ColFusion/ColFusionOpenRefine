@@ -78,7 +78,9 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
             }
             result.put("isEditing", isTableLocked && !isEditingByCurrentUser);
             result.put("isTimeOut", isTimeOut);
-            result.put("msg", "Table is being edited by User: " + metadataDbHandler.getUserLoginById(metadataDbHandler.getOperatingUserId(sid, tableName)));
+            if(isTableLocked && !isEditingByCurrentUser && !isTimeOut) {
+                result.put("msg", "Table is being edited by User: " + metadataDbHandler.getUserLoginById(metadataDbHandler.getOperatingUserId(sid, tableName)));
+            }
             result.put("successful", true);
         
             response.setCharacterEncoding("UTF-8");
