@@ -148,9 +148,12 @@ public class ColFusionOpenRefineProjectManager {
             }
 
             url = openrefineUrl + projectLink;
+            
+            System.out.println(String.format("Turl that will be returned is %s", url)); 
 
         } catch (Exception e) {
-
+            System.out.println(String.format("Something happened")); 
+            e.printStackTrace();
         } finally {
             ProjectManager.singleton.setBusy(false);
         }
