@@ -40,6 +40,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.refine.ProjectManager;
 import com.google.refine.ProjectMetadata;
 import com.google.refine.io.FileProjectManager;
@@ -51,6 +54,7 @@ import com.google.refine.model.Row;
 
 import edu.pitt.sis.exp.colfusion.dao.DatabaseHandler;
 import edu.pitt.sis.exp.colfusion.dao.MetadataDbHandler;
+import edu.pitt.sis.exp.colfusion.dao.MySQLDatabaseHandler;
 import edu.pitt.sis.exp.colfusion.dao.TargetDatabaseHandlerFactory;
 
 /**
@@ -59,6 +63,7 @@ import edu.pitt.sis.exp.colfusion.dao.TargetDatabaseHandlerFactory;
  */
 public class ColFusionOpenRefineProjectManager {
 
+    final static Logger logger = LoggerFactory.getLogger(ColFusionOpenRefineProjectManager.class.getName());
     
     public String createProjectToOpenRefine(int sid, String tableName)
             throws ClassNotFoundException, SQLException, IOException {
@@ -162,6 +167,8 @@ public class ColFusionOpenRefineProjectManager {
         // Get and set rows
         String tableName = metadataDbHandler.getTableName(sid);
 
+        System.out.println(String.format("Table name in ColFusionOpenRefineProjectManager.setProject method is %s", tableName)); 
+        
         int colCount = dbHandler.getColCount(sid, tableName);
 
         setProjectRow(project, dbHandler.getRows(tableName, colCount));
@@ -183,7 +190,11 @@ public class ColFusionOpenRefineProjectManager {
             Row row = new Row(rows.get(j).size());
             for (int k = 0; k < rows.get(j).size(); k++) {
                 Cell cell = new Cell(rows.get(j).get(k), null);
+                
+                System.out.println(String.format("Setting row %d, cell %k to value %s", j, k, cell.value.toString())); 
+                
                 row.setCell(k, cell);
+                
             }
             project.rows.add(row);
         }

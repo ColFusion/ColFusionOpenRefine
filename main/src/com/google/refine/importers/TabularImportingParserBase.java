@@ -58,10 +58,6 @@ import java.util.Date;
 import java.util.Calendar; 
 import java.text.SimpleDateFormat;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.Transaction;
 
 abstract public class TabularImportingParserBase extends ImportingParserBase {
     private final static Logger logger = LoggerFactory.getLogger("ImportingParserBase");

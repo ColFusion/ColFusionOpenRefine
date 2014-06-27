@@ -175,11 +175,19 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
                     int colIndex = 1;
                     ArrayList<String> temp = new ArrayList<String>();
                     while (colIndex <= colCount) {
-                        temp.add(rs1.getString(colIndex));
+                        
+                        String val = rs1.getString(colIndex);
+                        
+                        logger.info(String.format("Got value %s for col index %d in getRows in dbHandler", val, colIndex));
+                        
+                        temp.add(val);
                         colIndex++;
                     }
                     rows.add(temp);
                 }
+                
+                logger.info(String.format("Number of rows read from database is %d", rows.size()));
+                
                 return rows;
 
             } catch (SQLException e) {
