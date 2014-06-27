@@ -196,7 +196,7 @@ public class ColFusionOpenRefineProjectManager {
             for (int k = 0; k < rows.get(j).size(); k++) {
                 Cell cell = new Cell(rows.get(j).get(k), null);
                 
-                System.out.println(String.format("Setting row %d, cell %k to value %s", j, k, cell.value.toString())); 
+                System.out.println(String.format("Setting row %d, cell %d to value %s", j, k, cell.value.toString())); 
                 
                 row.setCell(k, cell);
                 
