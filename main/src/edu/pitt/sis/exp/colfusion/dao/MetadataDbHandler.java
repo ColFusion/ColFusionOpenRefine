@@ -560,7 +560,7 @@ public class MetadataDbHandler {
 
         try (Connection connection = dbHandler.getConnection()) {
 
-            String sql = "select tableName from colfusion_columntableinfo where cid = (select cid from colfusion_dnameinfo where sid = ?  limit 1)";
+            String sql = "select tableName from colfusion_columnTableInfo where cid = (select cid from colfusion_dnameinfo where sid = ?  limit 1)";
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, sid);

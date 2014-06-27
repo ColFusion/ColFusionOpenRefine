@@ -72,6 +72,10 @@ public class ColFusionOpenRefineProjectManager {
         in.close();
         
         String fileDir = p.getProperty("file_dir");
+        String openrefineUrl = p.getProperty("openrefine_link");
+        System.out.println("************************************************");
+        System.out.println("OpenRefineUrl: " + openrefineUrl);
+        System.out.println("************************************************");
         
         // DatabaseConnectionInfo databaseConnectionInfo = new
         // DatabaseConnectionInfo("127.0.0.1", 3306, "root", "",
@@ -138,7 +142,7 @@ public class ColFusionOpenRefineProjectManager {
                 projectLink = project.id + "";
             }
 
-            url = "http://127.0.0.1:3333/project?project=" + projectLink;
+            url = openrefineUrl + projectLink;
 
         } catch (Exception e) {
 
