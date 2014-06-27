@@ -170,6 +170,8 @@ public class ColFusionOpenRefineProjectManager {
         System.out.println(String.format("Table name in ColFusionOpenRefineProjectManager.setProject method is %s", tableName)); 
         
         int colCount = dbHandler.getColCount(sid, tableName);
+        
+        System.out.println(String.format("colCount in ColFusionOpenRefineProjectManager.setProject method is %d", colCount)); 
 
         setProjectRow(project, dbHandler.getRows(tableName, colCount));
     }
