@@ -139,9 +139,13 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
             String sql = "select count(*) from information_schema.columns where table_schema= ? and table_name= ?";
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, "colfusion_filetodb_" + sid);
+                //TODO: read database prefix from properties
+                statement.setString(1, "colfusion2_0_filetodb_" + sid);
                 statement.setString(2, tableName);
 
+                logger.info(String.format("getColCount: sid = %d, tableName: %s", sid, tableName));
+                logger.info(String.format("getColCount: The query to execute will be like this: select count(*) from information_schema.columns where table_schema= '%s' and table_name= '%s'", "colfusion2_0_filetodb_" + sid, tableName));
+                
                 int colCount = 0;
                 ResultSet rs = statement.executeQuery();
                 while (rs.next()) {
