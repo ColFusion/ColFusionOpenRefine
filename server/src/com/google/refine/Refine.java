@@ -75,7 +75,7 @@ import com.google.util.threads.ThreadPoolExecutorAdapter;
  */
 public class Refine {
     
-    static private final String DEFAULT_HOST = "127.0.0.1";
+    static private final String DEFAULT_HOST = "localhost"; //"127.0.0.1";
     static private final int DEFAULT_PORT = 3333;
         
     static private int port;
@@ -83,7 +83,7 @@ public class Refine {
 
     final static Logger logger = LoggerFactory.getLogger("refine");
         
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
         
         // tell jetty to use SLF4J for logging instead of its own stuff
         System.setProperty("VERBOSE","false");
@@ -108,7 +108,7 @@ public class Refine {
         refine.init(args);
     }
 
-    public void init(String[] args) throws Exception {
+    public void init(final String[] args) throws Exception {
 
         RefineServer server = new RefineServer();
         server.init(host,port);
@@ -143,7 +143,7 @@ class RefineServer extends Server {
         
     private ThreadPoolExecutor threadPool;
     
-    public void init(String host, int port) throws Exception {
+    public void init(final String host, final int port) throws Exception {
         logger.info("Starting Server bound to '" + host + ":" + port + "'");
 
         String memory = Configurations.get("refine.memory");
@@ -222,7 +222,7 @@ class RefineServer extends Server {
         }
     }
         
-    static private boolean isWebapp(File dir) {
+    static private boolean isWebapp(final File dir) {
         if (dir == null) {
             return false;
         }
@@ -249,7 +249,7 @@ class RefineServer extends Server {
 
         scanner.addListener(new Scanner.BulkListener() {
             @Override
-            public void filesChanged(@SuppressWarnings("rawtypes") List changedFiles) {
+            public void filesChanged(@SuppressWarnings("rawtypes") final List changedFiles) {
                 try {
                     logger.info("Stopping context: " + contextRoot.getAbsolutePath());
                     context.stop();
@@ -267,10 +267,10 @@ class RefineServer extends Server {
         scanner.start();
     }
     
-    static private void findFiles(final String extension, File baseDir, final Collection<File> found) {
+    static private void findFiles(final String extension, final File baseDir, final Collection<File> found) {
         baseDir.listFiles(new FileFilter() {
             @Override
-            public boolean accept(File pathname) {
+            public boolean accept(final File pathname) {
                 if (pathname.isDirectory()) {
                     findFiles(extension, pathname, found);
                 } else if (pathname.getName().endsWith(extension)) {
@@ -284,7 +284,7 @@ class RefineServer extends Server {
     // inject configuration parameters in the servlets
     // NOTE: this is done *after* starting the server because jetty might override the init
     // parameters if we set them in the webapp context upon reading the web.xml file    
-    static private void configure(WebAppContext context) throws Exception {
+    static private void configure(final WebAppContext context) throws Exception {
         ServletHolder servlet = context.getServletHandler().getServlet("refine");
         if (servlet != null) {
             servlet.setInitParameter("refine.data", getDataDir());
@@ -431,7 +431,7 @@ class RefineServer extends Server {
      * those characters might get replaced with ?. We need to use the environment
      * APPDATA value to substitute back the original user ID.
      */
-    static private String fixWindowsUnicodePath(String path) {
+    static private String fixWindowsUnicodePath(final String path) {
         int q = path.indexOf('?');
         if (q < 0) {
             return path;
@@ -465,7 +465,7 @@ class RefineClient extends JFrame implements ActionListener {
     
     private URI uri;
     
-    public void init(String host, int port) throws Exception {
+    public void init(final String host, final int port) throws Exception {
 
         uri = new URI("http://" + host + ":" + port + "/");
 
@@ -503,7 +503,7 @@ class RefineClient extends JFrame implements ActionListener {
     }
     
     @Override
-    public void actionPerformed(ActionEvent e) { 
+    public void actionPerformed(final ActionEvent e) { 
         String item = e.getActionCommand(); 
         if (item.startsWith("Open")) {
             openBrowser();
@@ -524,9 +524,9 @@ class RefineClient extends JFrame implements ActionListener {
 
 class ShutdownSignalHandler implements Runnable {
     
-    private Server _server;
+    private final Server _server;
 
-    public ShutdownSignalHandler(Server server) {
+    public ShutdownSignalHandler(final Server server) {
         this._server = server;
     }
 
