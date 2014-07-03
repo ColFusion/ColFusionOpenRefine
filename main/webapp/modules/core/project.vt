@@ -65,8 +65,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <div id="project-controls">
 
         
-        <button onclick = saveData()>Save</button> <!-- Alex Button, alexbutton-->
-        
+        <!--<button id="saveButton" onclick = saveData()>Save</button> Alex Button, alexbutton-->
+        <input type="button" id="saveButton" value="Save" onclick="saveData()" />
         
         <script type="text/javascript">
 

@@ -68,15 +68,15 @@ public class MassRowChange implements Change {
             
             project.update();
             
-            try {
-                DatabaseOperation.databaseRowsColsUpdate(DatabaseOperation.getReorderedRows(project),project.columnModel.columns,project.getMetadata().getName(),project.id);
-            } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (SQLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            // try {
+            //     DatabaseOperation.databaseRowsColsUpdate(DatabaseOperation.getReorderedRows(project),project.columnModel.columns,project.getMetadata().getName(),project.id);
+            // } catch (ClassNotFoundException e) {
+            //     // TODO Auto-generated catch block
+            //     e.printStackTrace();
+            // } catch (SQLException e) {
+            //     // TODO Auto-generated catch block
+            //     e.printStackTrace();
+            // }
         }
     }
 
@@ -88,15 +88,15 @@ public class MassRowChange implements Change {
             
             project.update();
             
-            try {
-                DatabaseOperation.databaseRowsColsUpdate(DatabaseOperation.getReorderedRows(project),project.columnModel.columns,project.getMetadata().getName(),project.id);
-            } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (SQLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            // try {
+            //     DatabaseOperation.databaseRowsColsUpdate(DatabaseOperation.getReorderedRows(project),project.columnModel.columns,project.getMetadata().getName(),project.id);
+            // } catch (ClassNotFoundException e) {
+            //     // TODO Auto-generated catch block
+            //     e.printStackTrace();
+            // } catch (SQLException e) {
+            //     // TODO Auto-generated catch block
+            //     e.printStackTrace();
+            // }
         }
     }
 

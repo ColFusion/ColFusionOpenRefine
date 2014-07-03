@@ -68,13 +68,13 @@ public class CellChange implements Change {
         Column column = project.columnModel.getColumnByCellIndex(cellIndex);
         column.clearPrecomputes();
         ProjectManager.singleton.getInterProjectModel().flushJoinsInvolvingProjectColumn(project.id, column.getName());
-    try {
-        DatabaseOperation.databaseRowsColsUpdate(DatabaseOperation.getReorderedRows(project),project.columnModel.columns,project.getMetadata().getName(),project.id);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    // try {
+    //     DatabaseOperation.databaseRowsColsUpdate(DatabaseOperation.getReorderedRows(project),project.columnModel.columns,project.getMetadata().getName(),project.id);
+    //     } catch (ClassNotFoundException e) {
+    //         e.printStackTrace();
+    //     } catch (SQLException e) {
+    //         e.printStackTrace();
+    //     }
     }
 
     @Override
@@ -84,13 +84,13 @@ public class CellChange implements Change {
         Column column = project.columnModel.getColumnByCellIndex(cellIndex);
         column.clearPrecomputes();
         ProjectManager.singleton.getInterProjectModel().flushJoinsInvolvingProjectColumn(project.id, column.getName());
-    try {
-        DatabaseOperation.databaseRowsColsUpdate(DatabaseOperation.getReorderedRows(project),project.columnModel.columns,project.getMetadata().getName(),project.id);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    // try {
+    //     DatabaseOperation.databaseRowsColsUpdate(DatabaseOperation.getReorderedRows(project),project.columnModel.columns,project.getMetadata().getName(),project.id);
+    //     } catch (ClassNotFoundException e) {
+    //         e.printStackTrace();
+    //     } catch (SQLException e) {
+    //         e.printStackTrace();
+    //     }
     }
     
     @Override

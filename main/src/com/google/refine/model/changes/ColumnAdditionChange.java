@@ -112,15 +112,15 @@ public class ColumnAdditionChange extends ColumnChange {
             project.update();
 // Added by yeqiu
             
-            try {
-                DatabaseOperation.databaseRowsColsUpdate(DatabaseOperation.getReorderedRows(project),project.columnModel.columns,project.getMetadata().getName(),project.id);
-            } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (SQLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            // try {
+            //     DatabaseOperation.databaseRowsColsUpdate(DatabaseOperation.getReorderedRows(project),project.columnModel.columns,project.getMetadata().getName(),project.id);
+            // } catch (ClassNotFoundException e) {
+            //     // TODO Auto-generated catch block
+            //     e.printStackTrace();
+            // } catch (SQLException e) {
+            //     // TODO Auto-generated catch block
+            //     e.printStackTrace();
+            // }
 
         //     System.out.println("***************" + _columnIndex + "\n*************");
         //     try {
@@ -147,15 +147,15 @@ public class ColumnAdditionChange extends ColumnChange {
             project.columnModel.columnGroups.addAll(_oldColumnGroups);
             
             project.update();
-            try {
-                DatabaseOperation.databaseRowsColsUpdate(DatabaseOperation.getReorderedRows(project),project.columnModel.columns,project.getMetadata().getName(),project.id);
-            } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (SQLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            // try {
+            //     DatabaseOperation.databaseRowsColsUpdate(DatabaseOperation.getReorderedRows(project),project.columnModel.columns,project.getMetadata().getName(),project.id);
+            // } catch (ClassNotFoundException e) {
+            //     // TODO Auto-generated catch block
+            //     e.printStackTrace();
+            // } catch (SQLException e) {
+            //     // TODO Auto-generated catch block
+            //     e.printStackTrace();
+            // }
         }
     }
 

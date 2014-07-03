@@ -67,4 +67,8 @@ public abstract class DatabaseHandler {
     public abstract void createTempTable(String query, int sid, String tableName) throws SQLException;
     
     public abstract void insertIntoTempTable(String query, int sid, String tableName) throws SQLException;
+    
+    public abstract void createOriginalTable(String query, int sid, String tableName) throws SQLException;
+    
+    public abstract void insertIntoTable(String query, int sid, String tableName) throws SQLException;
 }

@@ -467,22 +467,41 @@ Refine.getPermanentLink = function() {
 };
 
 Refine.saveChangesColFusionDB = function(openRefinProjectId, colfusionUserId) {  // Alex
-  $.ajax({
-      // url: "http://localhost:8080/ColFusionServer/OpenRefine/saveChanges/" + openRefinProjectId + "/" + $("#user_id").val(),
-      url: "http://localhost:8080/ColFusionServer/OpenRefine/saveChanges/" + openRefinProjectId + "/" + colfusionUserId, 
-      type: 'GET',
-      dataType: 'json',
-      contentType: "application/json",
-      crossDomain: true,
-      success: function(data) {
-        // alert("fffaaa");
-          if (data.successful) {                   
-              var testMsg = data.payload;
-              alert(testMsg);
-              window.close();
-          }
-      }
-   });
+
+  document.getElementById("saveButton").value = "Save is being processed...";
+  document.getElementById("saveButton").disabled = true;
+
+  $.post(
+    "command/core/save-project-data-to-database?" + $.param({ "projectId": openRefinProjectId , "colfusionUserId": colfusionUserId}),
+    null,
+    function(data) {
+      // TODO: Can add something here, maybe the codes in current ".done"
+      alert(data.msg);
+    },
+    "json"
+  ).done(function() {
+    
+    document.getElementById("saveButton").value = "Save";
+    document.getElementById("saveButton").disabled = false;
+  });
+
+
+  // $.ajax({
+  //     // url: "http://localhost:8080/ColFusionServer/OpenRefine/saveChanges/" + openRefinProjectId + "/" + $("#user_id").val(),
+  //     url: "http://localhost:8080/ColFusionServer/OpenRefine/saveChanges/" + openRefinProjectId + "/" + colfusionUserId, 
+  //     type: 'GET',
+  //     dataType: 'json',
+  //     contentType: "application/json",
+  //     crossDomain: true,
+  //     success: function(data) {
+  //       // alert("fffaaa");
+  //         if (data.successful) {                   
+  //             var testMsg = data.payload;
+  //             alert(testMsg);
+  //             window.close();
+  //         }
+  //     }
+  //  });
 };
 
 Refine.cancelChangesColFusionDB = function(openRefinProjectId) {  // Alex

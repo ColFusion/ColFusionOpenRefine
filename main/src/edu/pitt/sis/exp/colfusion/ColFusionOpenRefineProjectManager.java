@@ -96,10 +96,8 @@ public class ColFusionOpenRefineProjectManager {
              */
             if (databaseHandler.tempTableExist(sid, tableName)) {
                 databaseHandler.removeTable(sid, "temp_" + tableName);
-                databaseHandler.backupOriginalTable(sid, tableName);
-            } else {
-                databaseHandler.backupOriginalTable(sid, tableName);
             }
+            databaseHandler.backupOriginalTable(sid, tableName);
             /*
              * Create a new project for the table in the database
              */

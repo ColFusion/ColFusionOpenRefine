@@ -273,5 +273,51 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
             throw e;
         }
     }
+    
+    @Override
+    public void createOriginalTable(String query, int sid, String tableName)
+            throws SQLException {
+
+        logger.info(String.format("Creating table for sid %d and table %s", sid, tableName));
+
+        try (Connection connection = getConnection()) {
+
+            try (Statement statement = connection.createStatement()) {
+
+                statement.executeUpdate(query);
+
+            } catch (SQLException e) {
+                logger.error(String.format("Creating table for sid %d and table %s FAILED", sid, tableName), e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to Creating table for sid %d and table %s", sid, tableName));
+            throw e;
+        }
+    }
+    
+    @Override
+    public void insertIntoTable(String query, int sid, String tableName)
+            throws SQLException {
+
+        logger.info(String.format("Inserting into table temp_%s for sid %d", tableName, sid));
+
+        try (Connection connection = getConnection()) {
+
+            try (Statement statement = connection.createStatement()) {
+
+                statement.executeUpdate(query);
+
+            } catch (SQLException e) {
+                logger.error(String.format("Inserting into table temp_%s for sid %d FAILED", tableName, sid), e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to Inserting into table temp_%s for sid %d", tableName, sid));
+            throw e;
+        }
+    }
 
 }
