@@ -54,7 +54,6 @@ import com.google.refine.model.Row;
 
 import edu.pitt.sis.exp.colfusion.dao.DatabaseHandler;
 import edu.pitt.sis.exp.colfusion.dao.MetadataDbHandler;
-import edu.pitt.sis.exp.colfusion.dao.MySQLDatabaseHandler;
 import edu.pitt.sis.exp.colfusion.dao.TargetDatabaseHandlerFactory;
 
 /**
@@ -121,7 +120,6 @@ public class ColFusionOpenRefineProjectManager {
                 FileProjectManager.initialize(dir);
 
                 project.update();
-
                 FileProjectManager.singleton.registerProject(project, ppm);
                 FileProjectManager.singleton.ensureProjectSaved(project.id);
                 /*

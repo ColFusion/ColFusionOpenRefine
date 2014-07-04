@@ -1,6 +1,8 @@
 
 package edu.pitt.sis.exp.colfusion.dao;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -8,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,14 +136,25 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
     @Override
     public int getColCount(int sid, String tableName) throws SQLException {
         logger.info(String.format("Getting column count for sid %d", sid));
-
+        Properties p = new Properties();
+        String fileName="/ColFusionOpenRefine.properties";
+        InputStream in = MySQLDatabaseHandler.class.getResourceAsStream(fileName);
+        try {
+            p.load(in);
+            in.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }  
+        
+        
+        String databasePrefix = p.getProperty("database_prefix");
         try (Connection connection = getConnection()) {
 
             String sql = "select count(*) from information_schema.columns where table_schema= ? and table_name= ?";
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 //TODO: read database prefix from properties
-                statement.setString(1, "colfusion2_0_filetodb_" + sid);
+                statement.setString(1, databasePrefix + sid);
                 statement.setString(2, tableName);
 
                 logger.info(String.format("getColCount: sid = %d, tableName: %s", sid, tableName));
