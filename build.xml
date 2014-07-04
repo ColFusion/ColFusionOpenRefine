@@ -136,6 +136,7 @@
             <classpath refid="webapp.class.path" />
         </javac>
         <copy file="${webapp.src.dir}/log4j.properties" tofile="${webapp.classes.dir}/log4j.properties"/>
+    	<copy file="${webapp.src.dir}/ColFusionOpenRefine.properties" tofile="${webapp.classes.dir}/ColFusionOpenRefine.properties"/>
     </target>
 
     <target name="build_tests" depends="build">
