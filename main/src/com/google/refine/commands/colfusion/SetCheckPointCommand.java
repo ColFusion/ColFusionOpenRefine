@@ -1,0 +1,220 @@
+
+package com.google.refine.commands.colfusion;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Properties;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.google.refine.commands.Command;
+import com.google.refine.io.FileProjectManager;
+import com.google.refine.model.Project;
+import com.google.refine.util.ParsingUtilities;
+
+public class SetCheckPointCommand extends Command {
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
+        Properties p = new Properties();
+        String fileName = "/ColFusionOpenRefine.properties";
+        InputStream in = SaveProjectDataToDatabaseCommand.class.getResourceAsStream(fileName);
+        p.load(in);
+        in.close();
+
+        Properties parameters = ParsingUtilities.parseUrlParameters(request);
+
+        String url = parameters.getProperty("url");
+        Long projectId = Long.valueOf(getProjectId(url));
+
+        Project project = FileProjectManager.singleton.getProject(projectId);
+        int historyEntrySize = project.history.getLastPastEntries(0).size();
+
+        String dir = p.getProperty("file_dir");
+        String tempFolder = p.getProperty("temp_folder");
+        
+        String tempDir = dir + tempFolder + "\\";
+        String projectDir = projectId + ".project\\";
+
+        if (!(new File(tempDir).isDirectory())) {
+            new File(tempDir).mkdir();
+        }
+
+        if (!(new File(tempDir + projectDir).isDirectory())) {
+            // If no copied project in temp folder, copy it to temp folder
+            copyFolder(dir + projectDir, tempDir + projectDir);
+            if (!(new File(tempDir + projectDir + "history").isDirectory())) {
+                new File(tempDir + projectDir + "history").mkdir();
+            }
+        } else {
+            /*
+             * If copied project exists in temp folder, then check if they have the 
+             * same history, if not, roll back to temp folder's status, because temp 
+             * folder's history exist only if user click "Save" button
+             */
+            File savedHistory = new File(tempDir + projectDir + "history");
+            String[] savedChanges = savedHistory.list();
+
+            File notSavedHistory = new File(dir + projectDir + "history");
+            String[] notSavedChanges = notSavedHistory.list();
+
+            int undoCount = notSavedChanges.length - savedChanges.length;
+
+            if (undoCount > 0) {
+                if (historyEntrySize - 1 - undoCount < 0) {
+                    project.history.undoRedo(Long.valueOf("0"));
+                } else {
+                    // If undoCount is "1", it means undo only the last change
+                    // If undoCount is "2", should undo last two changes
+                    Long lastDoneEntryID = project.history.getLastPastEntries(0).get(historyEntrySize - 1 - undoCount).id;
+                    project.history.undoRedo(lastDoneEntryID);
+                }
+            }
+        }
+
+        JSONObject result = new JSONObject();
+
+        try {
+
+            result.put("successful", true);
+            result.put("testMsg", getProjectId(url) + "hello!!!" + url);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        response.setCharacterEncoding("UTF-8");
+        response.setHeader("Content-Type", "application/json");
+        respond(response, result.toString());
+
+    }
+
+    private String getProjectId(String url) {
+        // 13 is the length of the projectId
+        // TODO: maybe we should put "13" into the .properties file
+        return url.substring(url.length() - 13);
+    }
+
+    private void copyFile(String sourceFile, String targetFile) {
+        try {
+            int byteread = 0;
+            File oldfile = new File(sourceFile);
+            if (oldfile.exists()) {
+                InputStream inStream = new FileInputStream(sourceFile);
+                @SuppressWarnings("resource")
+                FileOutputStream fs = new FileOutputStream(targetFile);
+                byte[] buffer = new byte[1444];
+                while ((byteread = inStream.read(buffer)) != -1) {
+                    fs.write(buffer, 0, byteread);
+                }
+                inStream.close();
+            }
+        } catch (Exception e) {
+            System.out.println("Error happens when copying files");
+            e.printStackTrace();
+
+        }
+    }
+
+    private void copyFolder(String sourceDir, String targetDir) {
+        try {
+            (new File(targetDir)).mkdirs();
+            File a = new File(sourceDir);
+            String[] file = a.list();
+            File temp = null;
+            for (int i = 0; i < file.length; i++) {
+                if (sourceDir.endsWith(File.separator)) {
+                    temp = new File(sourceDir + file[i]);
+                } else {
+                    temp = new File(sourceDir + File.separator + file[i]);
+                }
+
+                if (temp.isFile()) {
+                    FileInputStream input = new FileInputStream(temp);
+                    FileOutputStream output = new FileOutputStream(targetDir + "/" + (temp.getName()).toString());
+                    byte[] b = new byte[1024 * 5];
+                    int len;
+                    while ((len = input.read(b)) != -1) {
+                        output.write(b, 0, len);
+                    }
+                    output.flush();
+                    output.close();
+                    input.close();
+                }
+                if (temp.isDirectory()) {
+                    copyFolder(sourceDir + "/" + file[i], targetDir + "/" + file[i]);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error happens when copying files in folder");
+            e.printStackTrace();
+
+        }
+    }
+
+    private void copyZipFile(String sourceZipFile, String targetZipFile) {
+        InputStream inStream = null;
+        try {
+            inStream = new FileInputStream(sourceZipFile);
+        } catch (FileNotFoundException e) {
+            System.err.println("读取文件[" + sourceZipFile + "]发生错误" + "\r\n" + e.getCause());
+            return;
+        }
+        File targetFile = new File(targetZipFile);
+        OutputStream outStream = null;
+        try {
+            targetFile.createNewFile();
+            outStream = new FileOutputStream(targetFile);
+            byte[] by = new byte[1024];
+            while (inStream.available() > 0) {
+                inStream.read(by);
+                outStream.write(by);
+            }
+        } catch (IOException e) {
+            System.err.println("Error happens when create file [" + targetZipFile + "]" + "\r\n" + e.getCause());
+        } finally {
+            if (null != inStream) {
+                try {
+                    inStream.close();
+                } catch (IOException e) {
+                    System.err.println(e.getCause());
+                }
+            }
+            if (null != outStream) {
+                try {
+                    outStream.flush();
+                } catch (IOException e) {
+                    System.err.println(e.getCause());
+                }
+                try {
+                    outStream.close();
+                } catch (IOException e) {
+                    System.err.println(e.getCause());
+                }
+            }
+        }
+    }
+
+    public void deleteAllFilesOfDir(File path) {
+        if (!path.exists()) return;
+        if (path.isFile()) {
+            path.delete();
+            return;
+        }
+        File[] files = path.listFiles();
+        for (int i = 0; i < files.length; i++) {
+            deleteAllFilesOfDir(files[i]);
+        }
+        path.delete();
+    }
+}
