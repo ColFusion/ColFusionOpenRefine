@@ -27,6 +27,7 @@ import com.google.refine.model.Project;
 import edu.pitt.sis.exp.colfusion.dao.DatabaseHandler;
 import edu.pitt.sis.exp.colfusion.dao.MetadataDbHandler;
 import edu.pitt.sis.exp.colfusion.dao.TargetDatabaseHandlerFactory;
+import edu.pitt.sis.exp.colfusion.utils.CSVUtils;
 
 /**
  * @author xxl
@@ -75,6 +76,8 @@ public class SaveProjectDataToDatabaseCommand extends Command {
             if (metadataDbHandler.isTimeOutForCurrentUser(sid, tableName, Integer.valueOf(colfusionUserId), lockTime)) {
                 msg = "Time is out, cannot save!";
             } else {
+                int count = metadataDbHandler.getCountFromOpenRefineHistoryHelper(sid, tableName);
+                metadataDbHandler.updateOpenRefineHistoryHelper(sid, tableName, count, 1);
                 /*
                  * ***********update checkpoint************************
                  * Only the "Save" is valid, copy files to temp folder
@@ -130,23 +133,53 @@ public class SaveProjectDataToDatabaseCommand extends Command {
                 }
 
                 // 2. Insert rows into table
-                String insertQuery = "INSERT INTO " + tableName + " VALUES('";
+//                databaseHandler.insertIntoTable(sid, tableName, rows, columnNames);
+//                String insertQuery = "INSERT INTO " + tableName + " VALUES('";
+//                for (int j = 0; j < rows.size(); j++) {
+//                    for (int k = 0; k < columnNames.size(); k++) {
+//                        if (k < columnNames.size() - 1) {
+//                            insertQuery += rows.get(j).get(k) + "','";
+//                        } else {
+//                            insertQuery += rows.get(j).get(k) + "')";
+//                        }
+//                    }
+//                    insertQuery = insertQuery.replaceAll("\n", "");
+//                    try {
+//                        databaseHandler.insertIntoTable(insertQuery, sid, tableName);
+//                    } catch (SQLException e) {
+//                        e.printStackTrace();
+//                    }
+//                    insertQuery = "INSERT INTO " + tableName + " VALUES('";
+//                }
+                /*
+                 * *************test csv begin**********************
+                 */
+                ArrayList<String> fileRows = new ArrayList<>();
                 for (int j = 0; j < rows.size(); j++) {
+                    String tempRow = "";
                     for (int k = 0; k < columnNames.size(); k++) {
-                        if (k < columnNames.size() - 1) {
-                            insertQuery += rows.get(j).get(k) + "','";
+                        if(k != columnNames.size() - 1) {
+                            tempRow += removeSpace(rows.get(j).get(k)) + ",";
                         } else {
-                            insertQuery += rows.get(j).get(k) + "')";
+                            tempRow += removeSpace(rows.get(j).get(k));
                         }
                     }
-                    insertQuery = insertQuery.replaceAll("\n", "");
-                    try {
-                        databaseHandler.insertIntoTable(insertQuery, sid, tableName);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                    insertQuery = "INSERT INTO " + tableName + " VALUES('";
+                    fileRows.add(tempRow);
                 }
+                
+                String csvDir = p.getProperty("csv_file_dir");
+                String csvFileName = p.getProperty("csv_file_name");
+                
+                boolean isSuccess = CSVUtils.exportCsv(new File(dir + projectDir + csvFileName), fileRows);
+                
+                if(isSuccess) {
+                    databaseHandler.importCsvToTable(csvDir + projectId + ".project/" + csvFileName, tableName);
+                } else {
+                    logger.info("csv saving failed!");
+                }
+                /*
+                 * *************test csv end****************
+                 */
                 /*
                  * ********************************************************
                  */
@@ -357,4 +390,13 @@ public class SaveProjectDataToDatabaseCommand extends Command {
         }  
         path.delete();  
     }
+     private String removeSpace(String str) {
+         String result = "";
+         for(int i = 0; i < str.length(); i++) {
+             if(str.charAt(i) != ' ') {
+                 result += str.charAt(i);
+             }
+         }
+         return result;
+     }
 }

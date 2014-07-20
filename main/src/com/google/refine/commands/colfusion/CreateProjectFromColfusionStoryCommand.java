@@ -49,6 +49,16 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
 //            DatabaseHandler databaseHandler = TargetDatabaseHandlerFactory.getTargetDatabaseHandler(sid); // other db
             MetadataDbHandler metadataDbHandler = TargetDatabaseHandlerFactory.getMetadataDbHandler(); // colfusion db
             
+            int count = metadataDbHandler.getCountFromOpenRefineHistoryHelper(sid, tableName);
+            
+            if(count < 0) {
+                metadataDbHandler.insertIntoOpenRefineHistoryHelper(sid, tableName);
+            } else {
+                int isSaved = metadataDbHandler.getIsSavedFromOpenRefineHistoryHelper(sid, tableName);
+                metadataDbHandler.updateOpenRefineHistoryHelper(sid, tableName, 0, isSaved);
+            }
+            
+            
             JSONObject result = new JSONObject();
     
             boolean isTimeOut = false;

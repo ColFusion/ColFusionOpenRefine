@@ -14,7 +14,23 @@
     <div class="history-highlight" bind="pastHighlightDiv"></div>
   </div>
   <div class="history-now" bind="nowDiv"></div>
-  <div class="history-future" bind="futureDiv">
+  <div id="openrefine-history-future" class="history-future" bind="futureDiv">
     <div class="history-highlight" bind="futureHighlightDiv"></div>
   </div>
 </div>'
+<script type="text/javascript">
+  var openrefine_url = window.location.href.split('#')[2];
+  var openrefine_sid = window.location.href.split('#')[3];
+  var openrefine_tableName = window.location.href.split('#')[4];
+
+//   document.getElementById("openrefine-history-future").style.display = "none";
+  var count = 0;
+  $.post(
+    "command/core/is-history-shown?" + $.param({ "openrefineUrl": openrefine_url, "sid": openrefine_sid, "tableName": openrefine_tableName}),
+    null,
+    function(data) {
+    },
+    "json"
+  );
+        
+</script>

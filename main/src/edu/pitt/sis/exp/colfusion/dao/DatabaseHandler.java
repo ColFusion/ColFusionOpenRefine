@@ -71,4 +71,8 @@ public abstract class DatabaseHandler {
     public abstract void createOriginalTable(String query, int sid, String tableName) throws SQLException;
     
     public abstract void insertIntoTable(String query, int sid, String tableName) throws SQLException;
+    
+    public abstract void importCsvToTable(String dir, String tableName) throws SQLException;
+    
+//    public abstract void insertIntoTable(int sid, String tableName, ArrayList<ArrayList<String>> rows, ArrayList<String> columnNames) throws SQLException;
 }

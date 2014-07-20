@@ -333,5 +333,86 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
             throw e;
         }
     }
+    
+//    @Override
+//    public void insertIntoTable(int sid, String tableName, ArrayList<ArrayList<String>> rows, ArrayList<String> columnNames)
+//            throws SQLException {
+//
+//        logger.info(String.format("New!!!!!!!!!!!!!!!Inserting into table %s for sid %d", tableName, sid));
+//
+//        try (Connection connection = getConnection()) {
+//
+//            String sql = getSql(tableName, columnNames);
+//
+//            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+//                final int batchSize = 1000;
+//                int count = 0;
+//                
+//                for(ArrayList<String> row : rows) {
+//                    int index = 1;
+//                    for(String cell : row) {
+//                        statement.setString(index++, cell);
+//                    }
+//                    statement.addBatch();
+//
+//                    if(++count % batchSize == 0) {
+//                        statement.executeBatch();
+//                    }
+//                }
+//                statement.executeBatch();
+//
+//            } catch (SQLException e) {
+//                logger.error(String.format("Inserting into table %s for sid %d FAILED", tableName, sid), e);
+//
+//                throw e;
+//            }
+//        } catch (SQLException e) {
+//            logger.info(String.format("FAILED to Inserting into table %s for sid %d", tableName, sid));
+//            throw e;
+//        }
+//    }
+    @Override
+    public void importCsvToTable(String dir, String tableName) throws SQLException {
+        
+        logger.info(String.format("Importing from %s to table %s", dir, tableName));
+
+        try (Connection connection = getConnection()) {
+
+            String sql = String.format("load data infile '%s' into table %s  fields terminated by ','  optionally enclosed by '\"' escaped by '\"' lines terminated by '\\r\\n'", dir, tableName);
+
+            try (Statement statement = connection.createStatement()) {
+            System.out.println("****************");
+            System.out.println(sql);
+            System.out.println("****************");
+                statement.executeUpdate(sql);
+                
+            } catch (SQLException e) {
+                logger.error(String.format("Importing from %s to table %s FAILED", dir, tableName), e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to Importing from %s to table %s", dir, tableName));
+            throw e;
+        }
+    }
+    
+    private String getSql(String tableName, ArrayList<String> columnNames) {
+        String sql = "insert into " + tableName + " values (";
+        String values = "";
+        int size = columnNames.size();
+
+        for(int i = 0; i < size; i++) {
+            if(i != size - 1) {
+                values += "?, ";
+            } else {
+                values += "?)";
+            }
+        }
+        
+        sql += values;
+        
+        return sql;
+    }
 
 }

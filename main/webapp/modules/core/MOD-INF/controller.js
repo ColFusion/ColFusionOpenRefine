@@ -61,6 +61,8 @@ function registerCommands() {
   RS.registerCommand(module, "timeout-notice", new Packages.com.google.refine.commands.colfusion.TimeOutNoticeCommand());
   RS.registerCommand(module, "save-project-data-to-database", new Packages.com.google.refine.commands.colfusion.SaveProjectDataToDatabaseCommand());
   RS.registerCommand(module, "set-check-point", new Packages.com.google.refine.commands.colfusion.SetCheckPointCommand());
+  RS.registerCommand(module, "is-history-shown", new Packages.com.google.refine.commands.colfusion.IsHistoryShownCommand());
+  RS.registerCommand(module, "is-changes-saved", new Packages.com.google.refine.commands.colfusion.IsChangesSavedCommand());
 
   RS.registerCommand(module, "get-importing-configuration", new Packages.com.google.refine.commands.importing.GetImportingConfigurationCommand());
   RS.registerCommand(module, "create-importing-job", new Packages.com.google.refine.commands.importing.CreateImportingJobCommand());

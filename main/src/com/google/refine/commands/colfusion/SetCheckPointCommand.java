@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.SQLException;
 import java.util.Properties;
 
 import javax.servlet.ServletException;
@@ -18,9 +19,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.refine.commands.Command;
+import com.google.refine.history.HistoryEntry;
 import com.google.refine.io.FileProjectManager;
 import com.google.refine.model.Project;
 import com.google.refine.util.ParsingUtilities;
+
+import edu.pitt.sis.exp.colfusion.dao.MetadataDbHandler;
+import edu.pitt.sis.exp.colfusion.dao.TargetDatabaseHandlerFactory;
 
 public class SetCheckPointCommand extends Command {
 
@@ -35,8 +40,18 @@ public class SetCheckPointCommand extends Command {
 
         Properties parameters = ParsingUtilities.parseUrlParameters(request);
 
+        MetadataDbHandler metadataDbHandler = TargetDatabaseHandlerFactory.getMetadataDbHandler();
+        
         String url = parameters.getProperty("url");
         Long projectId = Long.valueOf(getProjectId(url));
+        int sid = -1;
+        String tableName = "";
+        try {
+            sid = metadataDbHandler.getSid(getProjectId(url));
+            tableName = metadataDbHandler.getTableName(sid);
+        } catch (SQLException e1) {
+            e1.printStackTrace();
+        }
 
         Project project = FileProjectManager.singleton.getProject(projectId);
         int historyEntrySize = project.history.getLastPastEntries(0).size();
@@ -65,20 +80,57 @@ public class SetCheckPointCommand extends Command {
              */
             File savedHistory = new File(tempDir + projectDir + "history");
             String[] savedChanges = savedHistory.list();
+            int savedChangesLength = 0;
+            if(savedHistory.list() != null) {
+                savedChangesLength = savedChanges.length;
+            }
 
             File notSavedHistory = new File(dir + projectDir + "history");
             String[] notSavedChanges = notSavedHistory.list();
+            int notSavedChangesLength = 0;
+            if(notSavedHistory.list() != null) {
+                notSavedChangesLength = notSavedChanges.length;
+            }
 
-            int undoCount = notSavedChanges.length - savedChanges.length;
+            int undoCount = notSavedChangesLength - savedChangesLength;
 
             if (undoCount > 0) {
                 if (historyEntrySize - 1 - undoCount < 0) {
                     project.history.undoRedo(Long.valueOf("0"));
-                } else {
+                } else if(savedChanges.length != historyEntrySize) {
+                    System.out.println("****************");
+                    System.out.println("savedChanges.length: " + savedChanges.length);
+                    System.out.println("historyEntrySize: " + historyEntrySize);
+                    System.out.println("****************");
                     // If undoCount is "1", it means undo only the last change
                     // If undoCount is "2", should undo last two changes
                     Long lastDoneEntryID = project.history.getLastPastEntries(0).get(historyEntrySize - 1 - undoCount).id;
                     project.history.undoRedo(lastDoneEntryID);
+                }
+            } else if (undoCount == 0) {
+                int count = -1;
+                int isSaved = -1;
+                try {
+                    count = metadataDbHandler.getCountFromOpenRefineHistoryHelper(sid, tableName);
+                    isSaved = metadataDbHandler.getIsSavedFromOpenRefineHistoryHelper(sid, tableName);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                if(isSaved != 1) {
+                    
+//                } else if(count == 1 && isSaved == 0) {
+                    
+                } else {
+                    HistoryEntry lastHistoryEntry = project.history.getLastPastEntries(0).get(historyEntrySize - 1);
+                    Long lastHistoryEntryId = project.history.getLastPastEntries(0).get(historyEntrySize - 1).id;
+                    Long lastDoneEntryID = project.history.getLastPastEntries(0).get(historyEntrySize - 2).id;
+                    project.history.undoRedo(lastDoneEntryID);
+                    project.history.addEntry(lastHistoryEntry);
+                    copyFile(tempDir + projectDir + "history\\" + lastHistoryEntryId + ".change.zip", dir + projectDir + "history\\" + lastHistoryEntryId + ".change.zip");
+                    
+                    File folderPath = new File(tempDir + projectDir);
+                    deleteAllFilesOfDir(folderPath);
+                    copyFolder(dir + projectDir, tempDir + projectDir);
                 }
             }
         }

@@ -118,6 +118,7 @@ public class MetadataDbHandler {
                     return rs.getInt("operatedUser");
                 }
 
+//                return -1;
                 String message = String.format(
                         "Getting operating user id for sid %d and table name %s returned 0 rows", sid, tableName);
 
@@ -818,6 +819,120 @@ public class MetadataDbHandler {
             }
         } catch (SQLException e) {
             logger.info(String.format("FAILED to Inserting into columninfo by table %s", tableName));
+            throw e;
+        }
+    }
+    
+    public void insertIntoOpenRefineHistoryHelper(int sid, String tableName)
+            throws SQLException {
+        logger.info(String.format("Inserting into OpenRefineHistoryHelper for sid %d, table %s", sid, tableName));
+        
+        try (Connection connection = dbHandler.getConnection()) {
+            
+            String sql = String.format("INSERT INTO colfusion_openrefine_history_helper VALUES(%d, '%s', 0, 1)", sid, tableName);
+            
+            try (Statement statement = connection.createStatement()) {
+
+                statement.executeUpdate(sql);
+
+            } catch (SQLException e) {
+                logger.error(
+                        String.format("Inserting into OpenRefineHistoryHelper for sid %d, table %s FAILED", sid, tableName),
+                        e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to Inserting into OpenRefineHistoryHelper for sid %d, table %s", sid, tableName));
+            throw e;
+        }
+    }
+    
+    public void updateOpenRefineHistoryHelper(int sid, String tableName, int count, int isSaved)
+            throws SQLException {
+        logger.info(String.format("Updating OpenRefineHistoryHelper for sid %d, table %s set count = %d", sid, tableName, count));
+        
+        try (Connection connection = dbHandler.getConnection()) {
+            
+            String sql = String.format("UPDATE colfusion_openrefine_history_helper SET count = %d, isSaved = %d WHERE sid = %d and tableName = '%s'", count, isSaved, sid, tableName);
+            
+            try (Statement statement = connection.createStatement()) {
+
+                statement.executeUpdate(sql);
+
+            } catch (SQLException e) {
+                logger.error(
+                        String.format("Updating OpenRefineHistoryHelper for sid %d, table %s set count = %d FAILED", sid, tableName, count),
+                        e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to Updating OpenRefineHistoryHelper for sid %d, table %s set count = %d", sid, tableName, count));
+            throw e;
+        }
+    }
+    
+    public int getCountFromOpenRefineHistoryHelper(int sid, String tableName) throws SQLException {
+        logger.info(String.format("Getting count for sid %d table %s", sid, tableName));
+        
+        try (Connection connection = dbHandler.getConnection()) {
+
+            
+            String sql = "select count from colfusion_openrefine_history_helper where sid = ? and tableName = ?";
+            
+            int count = -1;
+            
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, sid);
+                statement.setString(2, tableName);
+
+                ResultSet rs = statement.executeQuery();
+
+
+                while (rs.next()) {
+                    count = Integer.valueOf(rs.getString(1));
+            }
+                return count;
+            } catch (SQLException e) {
+                logger.error(String.format("Getting count for sid %d table %s FAILED", sid, tableName), e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to Getting count for sid %d table %s", sid, tableName));
+            throw e;
+        }
+    }
+    
+    public int getIsSavedFromOpenRefineHistoryHelper(int sid, String tableName) throws SQLException {
+        logger.info(String.format("Getting isSaved for sid %d table %s", sid, tableName));
+        
+        try (Connection connection = dbHandler.getConnection()) {
+
+            
+            String sql = "select isSaved from colfusion_openrefine_history_helper where sid = ? and tableName = ?";
+            
+            int isSaved = -1;
+            
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, sid);
+                statement.setString(2, tableName);
+
+                ResultSet rs = statement.executeQuery();
+
+
+                while (rs.next()) {
+                    isSaved = Integer.valueOf(rs.getString(1));
+            }
+                return isSaved;
+            } catch (SQLException e) {
+                logger.error(String.format("Getting isSaved for sid %d table %s FAILED", sid, tableName), e);
+
+                throw e;
+            }
+        } catch (SQLException e) {
+            logger.info(String.format("FAILED to Getting isSaved for sid %d table %s", sid, tableName));
             throw e;
         }
     }
