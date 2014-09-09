@@ -30,7 +30,7 @@ import edu.pitt.sis.exp.colfusion.dao.TargetDatabaseHandlerFactory;
 public class SetCheckPointCommand extends Command {
 
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response)
+    public void doGet(final HttpServletRequest request, final HttpServletResponse response)
             throws IOException, ServletException {
         Properties p = new Properties();
         String fileName = "/ColFusionOpenRefine.properties";
@@ -59,8 +59,8 @@ public class SetCheckPointCommand extends Command {
         String dir = p.getProperty("file_dir");
         String tempFolder = p.getProperty("temp_folder");
         
-        String tempDir = dir + tempFolder + "\\";
-        String projectDir = projectId + ".project\\";
+        String tempDir = dir + tempFolder + File.separator;
+        String projectDir = projectId + ".project" + File.separator;
 
         if (!(new File(tempDir).isDirectory())) {
             new File(tempDir).mkdir();
@@ -116,21 +116,35 @@ public class SetCheckPointCommand extends Command {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+                
                 if(isSaved != 1) {
                     
 //                } else if(count == 1 && isSaved == 0) {
                     
                 } else {
-                    HistoryEntry lastHistoryEntry = project.history.getLastPastEntries(0).get(historyEntrySize - 1);
-                    Long lastHistoryEntryId = project.history.getLastPastEntries(0).get(historyEntrySize - 1).id;
-                    Long lastDoneEntryID = project.history.getLastPastEntries(0).get(historyEntrySize - 2).id;
-                    project.history.undoRedo(lastDoneEntryID);
-                    project.history.addEntry(lastHistoryEntry);
-                    copyFile(tempDir + projectDir + "history\\" + lastHistoryEntryId + ".change.zip", dir + projectDir + "history\\" + lastHistoryEntryId + ".change.zip");
                     
-                    File folderPath = new File(tempDir + projectDir);
-                    deleteAllFilesOfDir(folderPath);
-                    copyFolder(dir + projectDir, tempDir + projectDir);
+                        if (historyEntrySize >=1) {
+                    
+                            HistoryEntry lastHistoryEntry = project.history.getLastPastEntries(0).get(historyEntrySize - 1);
+                            Long lastHistoryEntryId = project.history.getLastPastEntries(0).get(historyEntrySize - 1).id;
+                            
+                            if (historyEntrySize == 1) {
+                                project.history.undoRedo(0); // this will roll back to the project creation.
+                                project.history.addEntry(lastHistoryEntry);
+                            }
+                            else {
+                                Long lastDoneEntryID = project.history.getLastPastEntries(0).get(historyEntrySize - 2).id;
+                                project.history.undoRedo(lastDoneEntryID);
+                                project.history.addEntry(lastHistoryEntry);
+                            }
+                            
+                            copyFile(tempDir + projectDir + "history" + File.separator + lastHistoryEntryId + ".change.zip", dir + projectDir + "history" + File.separator + lastHistoryEntryId + ".change.zip");
+                            
+                            File folderPath = new File(tempDir + projectDir);
+                            deleteAllFilesOfDir(folderPath);
+                            copyFolder(dir + projectDir, tempDir + projectDir);
+                        
+                        }
                 }
             }
         }
@@ -151,13 +165,13 @@ public class SetCheckPointCommand extends Command {
 
     }
 
-    private String getProjectId(String url) {
+    private String getProjectId(final String url) {
         // 13 is the length of the projectId
         // TODO: maybe we should put "13" into the .properties file
         return url.substring(url.length() - 13);
     }
 
-    private void copyFile(String sourceFile, String targetFile) {
+    private void copyFile(final String sourceFile, final String targetFile) {
         try {
             int byteread = 0;
             File oldfile = new File(sourceFile);
@@ -178,7 +192,7 @@ public class SetCheckPointCommand extends Command {
         }
     }
 
-    private void copyFolder(String sourceDir, String targetDir) {
+    private void copyFolder(final String sourceDir, final String targetDir) {
         try {
             (new File(targetDir)).mkdirs();
             File a = new File(sourceDir);
@@ -214,12 +228,12 @@ public class SetCheckPointCommand extends Command {
         }
     }
 
-    private void copyZipFile(String sourceZipFile, String targetZipFile) {
+    private void copyZipFile(final String sourceZipFile, final String targetZipFile) {
         InputStream inStream = null;
         try {
             inStream = new FileInputStream(sourceZipFile);
         } catch (FileNotFoundException e) {
-            System.err.println("读取文件[" + sourceZipFile + "]发生错误" + "\r\n" + e.getCause());
+            System.err.println("[" + sourceZipFile + "]" + "\r\n" + e.getCause());
             return;
         }
         File targetFile = new File(targetZipFile);
@@ -257,8 +271,10 @@ public class SetCheckPointCommand extends Command {
         }
     }
 
-    public void deleteAllFilesOfDir(File path) {
-        if (!path.exists()) return;
+    public void deleteAllFilesOfDir(final File path) {
+        if (!path.exists()) {
+            return;
+        }
         if (path.isFile()) {
             path.delete();
             return;

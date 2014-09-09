@@ -41,7 +41,7 @@ public class SaveProjectDataToDatabaseCommand extends Command {
      * but just keep that file in case of future use.
      */
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
+    public void doPost(final HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException {
 
         Properties p = new Properties();
@@ -85,8 +85,8 @@ public class SaveProjectDataToDatabaseCommand extends Command {
                 String dir = p.getProperty("file_dir"); // + projectId + ".project";
                 String tempFolder = p.getProperty("temp_folder");
                 
-                String tempDir = dir + tempFolder + "\\";
-                String projectDir = projectId + ".project\\";
+                String tempDir = dir + tempFolder + File.separator;
+                String projectDir = projectId + ".project" + File.separator;
                 
                 File folderPath = new File(tempDir + projectDir);
                 deleteAllFilesOfDir(folderPath);
@@ -159,9 +159,9 @@ public class SaveProjectDataToDatabaseCommand extends Command {
                     String tempRow = "";
                     for (int k = 0; k < columnNames.size(); k++) {
                         if(k != columnNames.size() - 1) {
-                            tempRow += removeSpace(rows.get(j).get(k)) + ",";
+                            tempRow += rows.get(j).get(k) + ",";
                         } else {
-                            tempRow += removeSpace(rows.get(j).get(k));
+                            tempRow += rows.get(j).get(k);
                         }
                     }
                     fileRows.add(tempRow);
@@ -173,7 +173,7 @@ public class SaveProjectDataToDatabaseCommand extends Command {
                 boolean isSuccess = CSVUtils.exportCsv(new File(dir + projectDir + csvFileName), fileRows);
                 
                 if(isSuccess) {
-                    databaseHandler.importCsvToTable(csvDir + projectId + ".project/" + csvFileName, tableName);
+                    databaseHandler.importCsvToTable(csvDir + projectId + ".project" + File.separator + csvFileName, tableName);
                 } else {
                     logger.info("csv saving failed!");
                 }
@@ -185,43 +185,43 @@ public class SaveProjectDataToDatabaseCommand extends Command {
                  */
 
                 ArrayList<Integer> cids;
-                try {
-                    /*
-                     * Update columns information in colfusion_dnameinfo
-                     */
-                    cids = metadataDbHandler.getCidsBySid(sid);
-                    // 1. Remove all the rows which's sid is Sid
-                    metadataDbHandler.deleteDnameinfoRowsBySid(sid);
-                    // 2. Add columns into the table
-                    for (int k = 0; k < columnNames.size(); k++) {
-                        String addRows = String
-                                .format("INSERT INTO colfusion_dnameinfo VALUES(NULL, %d, '%s', 'String', NULL, NULL, NULL, '%s', b'0', NULL, NULL)",
-                                        sid, columnNames.get(k), columnNames.get(k));
-                        metadataDbHandler.insertIntoDnameinfo(addRows, sid);
-                    }
-
-                    /*
-                     * Update columns information in colfusion_columnTableInfo
-                     */
-                    // 1. Remove all the rows which's cid is cid
-                    for (int j = 0; j < cids.size(); j++) {
-                        String getOriginalCids = String.format("DELETE FROM colfusion_columnTableInfo WHERE cid = %d",
-                                cids.get(j));
-                        metadataDbHandler.deleteColumninfoRowsByCid(getOriginalCids, cids.get(j));
-                    }
-                    // 2. Add all new added columns
-                    ArrayList<Integer> newCids = metadataDbHandler.getCidsBySid(sid);
-
-                    for (int n = 0; n < newCids.size(); n++) {
-                        String addColumns = String.format("INSERT INTO colfusion_columnTableInfo VALUES(%d, '%s')",
-                                newCids.get(n), tableName);
-                        metadataDbHandler.insertIntoColumninfo(addColumns, tableName);
-                    }
+//                try {
+//                    /*
+//                     * Update columns information in colfusion_dnameinfo
+//                     */
+//                    cids = metadataDbHandler.getCidsBySid(sid);
+//                    // 1. Remove all the rows which's sid is Sid
+//                    metadataDbHandler.deleteDnameinfoRowsBySid(sid);
+//                    // 2. Add columns into the table
+//                    for (int k = 0; k < columnNames.size(); k++) {
+//                        String addRows = String
+//                                .format("INSERT INTO colfusion_dnameinfo VALUES(NULL, %d, '%s', 'String', NULL, NULL, NULL, '%s', b'0', NULL, NULL)",
+//                                        sid, columnNames.get(k), columnNames.get(k));
+//                        metadataDbHandler.insertIntoDnameinfo(addRows, sid);
+//                    }
+//
+//                    /*
+//                     * Update columns information in colfusion_columnTableInfo
+//                     */
+//                    // 1. Remove all the rows which's cid is cid
+//                    for (int j = 0; j < cids.size(); j++) {
+//                        String getOriginalCids = String.format("DELETE FROM colfusion_columnTableInfo WHERE cid = %d",
+//                                cids.get(j));
+//                        metadataDbHandler.deleteColumninfoRowsByCid(getOriginalCids, cids.get(j));
+//                    }
+//                    // 2. Add all new added columns
+//                    ArrayList<Integer> newCids = metadataDbHandler.getCidsBySid(sid);
+//
+//                    for (int n = 0; n < newCids.size(); n++) {
+//                        String addColumns = String.format("INSERT INTO colfusion_columnTableInfo VALUES(%d, '%s')",
+//                                newCids.get(n), tableName);
+//                        metadataDbHandler.insertIntoColumninfo(addColumns, tableName);
+//                    }
 
                     msg = "Changes have been saved!";
-                } catch (SQLException e1) {
-                    e1.printStackTrace();
-                }
+//                } catch (SQLException e1) {
+//                    e1.printStackTrace();
+//                }
 
             }
         } catch (NumberFormatException e) {
@@ -246,12 +246,12 @@ public class SaveProjectDataToDatabaseCommand extends Command {
         }
     }
 
-    public static String headlineControl(String str) {
+    public static String headlineControl(final String str) {
         String result = "`" + str + "`";
         return result;
     }
 
-    public static ArrayList<ArrayList<String>> getReorderedRows(Project project) {
+    public static ArrayList<ArrayList<String>> getReorderedRows(final Project project) {
         ArrayList<ArrayList<String>> rows = new ArrayList<ArrayList<String>>();
         if (project.columnModel.columns.isEmpty() || project.rows.isEmpty()) {
             return rows;
@@ -277,7 +277,7 @@ public class SaveProjectDataToDatabaseCommand extends Command {
 
     }
     
-    private void copyFile(String sourceFile, String targetFile) {
+    private void copyFile(final String sourceFile, final String targetFile) {
         try {
             int byteread = 0;
             File oldfile = new File(sourceFile);
@@ -298,7 +298,7 @@ public class SaveProjectDataToDatabaseCommand extends Command {
         }
     }
 
-    private void copyFolder(String sourceDir, String targetDir) {
+    private void copyFolder(final String sourceDir, final String targetDir) {
         try {
             (new File(targetDir)).mkdirs();
             File a = new File(sourceDir);
@@ -334,7 +334,7 @@ public class SaveProjectDataToDatabaseCommand extends Command {
         }
     }
     
-    private void copyZipFile(String sourceZipFile, String targetZipFile) {
+    private void copyZipFile(final String sourceZipFile, final String targetZipFile) {
         InputStream inStream = null;
         try {
             inStream = new FileInputStream(sourceZipFile);
@@ -377,9 +377,10 @@ public class SaveProjectDataToDatabaseCommand extends Command {
         }
     }
     
-    public void deleteAllFilesOfDir(File path) {
-        if (!path.exists())  
-            return;  
+    public void deleteAllFilesOfDir(final File path) {
+        if (!path.exists()) {
+            return;
+        }  
         if (path.isFile()) {  
             path.delete();  
             return;  
@@ -390,7 +391,7 @@ public class SaveProjectDataToDatabaseCommand extends Command {
         }  
         path.delete();  
     }
-     private String removeSpace(String str) {
+     private String removeSpace(final String str) {
          String result = "";
          for(int i = 0; i < str.length(); i++) {
              if(str.charAt(i) != ' ') {

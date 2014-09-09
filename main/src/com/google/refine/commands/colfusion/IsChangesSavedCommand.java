@@ -25,7 +25,7 @@ import edu.pitt.sis.exp.colfusion.dao.TargetDatabaseHandlerFactory;
  */
 public class IsChangesSavedCommand extends Command {
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response)
+    public void doGet(final HttpServletRequest request, final HttpServletResponse response)
             throws IOException, ServletException {
         Properties p = new Properties();
         String fileName = "/ColFusionOpenRefine.properties";
@@ -51,8 +51,8 @@ public class IsChangesSavedCommand extends Command {
             String dir = p.getProperty("file_dir");
             String tempFolder = p.getProperty("temp_folder");
             
-            String tempDir = dir + tempFolder + "\\";
-            String projectDir = projectId + ".project\\";
+            String tempDir = dir + tempFolder + File.separator;
+            String projectDir = projectId + ".project" + File.separator;
             
             File savedHistory = new File(tempDir + projectDir + "history");
             String[] savedChanges = savedHistory.list();

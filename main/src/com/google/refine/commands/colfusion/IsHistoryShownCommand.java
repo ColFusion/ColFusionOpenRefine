@@ -22,7 +22,7 @@ import edu.pitt.sis.exp.colfusion.dao.TargetDatabaseHandlerFactory;
 
 public class IsHistoryShownCommand extends Command {
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
+    public void doPost(final HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException {
         Properties p = new Properties();
         String fileName = "/ColFusionOpenRefine.properties";
@@ -40,8 +40,8 @@ public class IsHistoryShownCommand extends Command {
         String dir = p.getProperty("file_dir");
         String tempFolder = p.getProperty("temp_folder");
         
-        String tempDir = dir + tempFolder + "\\";
-        String projectDir = projectId + ".project\\";
+        String tempDir = dir + tempFolder + File.separator;
+        String projectDir = projectId + ".project" + File.separator;
         
         File savedHistory = new File(tempDir + projectDir + "history");
         String[] savedChanges = savedHistory.list();
@@ -96,7 +96,7 @@ public class IsHistoryShownCommand extends Command {
         }
     }
     
-    private String getProjectId(String url) {
+    private String getProjectId(final String url) {
         // 13 is the length of the projectId
         // TODO: maybe we should put "13" into the .properties file
         return url.substring(url.length() - 13);

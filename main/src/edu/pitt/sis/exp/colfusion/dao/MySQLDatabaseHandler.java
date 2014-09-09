@@ -25,7 +25,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
 
     final static Logger logger = LoggerFactory.getLogger(MySQLDatabaseHandler.class.getName());
 
-    public MySQLDatabaseHandler(DatabaseConnectionInfo databaseConnectionInfo) throws ClassNotFoundException {
+    public MySQLDatabaseHandler(final DatabaseConnectionInfo databaseConnectionInfo) throws ClassNotFoundException {
         super(databaseConnectionInfo);// TODO Auto-generated constructor stub
 
         Class.forName("com.mysql.jdbc.Driver");
@@ -54,7 +54,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
     }
 
     @Override
-    public boolean tempTableExist(int sid, String tableName)
+    public boolean tempTableExist(final int sid, final String tableName)
             throws SQLException {
         logger.info(String.format("Getting if temp table exists for sid %d and tablename %s", sid, tableName));
 
@@ -85,7 +85,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
     }
 
     @Override
-    public void removeTable(int sid, String tableName)
+    public void removeTable(final int sid, final String tableName)
             throws SQLException {
         logger.info(String.format("Removing table for sid %d and tablename %s", sid, tableName));
 
@@ -109,7 +109,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
     }
 
     @Override
-    public void backupOriginalTable(int sid, String tableName)
+    public void backupOriginalTable(final int sid, final String tableName)
             throws SQLException {
 
         logger.info(String.format("Backing up table for sid %d and tablename %s", sid, tableName));
@@ -134,7 +134,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
     }
 
     @Override
-    public int getColCount(int sid, String tableName) throws SQLException {
+    public int getColCount(final int sid, final String tableName) throws SQLException {
         logger.info(String.format("Getting column count for sid %d", sid));
         Properties p = new Properties();
         String fileName="/ColFusionOpenRefine.properties";
@@ -179,7 +179,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
     }
     
     @Override
-    public ArrayList<ArrayList<String>> getRows(String tableName, int colCount) throws SQLException {
+    public ArrayList<ArrayList<String>> getRows(final String tableName, final int colCount) throws SQLException {
         logger.info(String.format("Getting rows for table %s", tableName));
         ArrayList<ArrayList<String>> rows = new ArrayList<ArrayList<String>>();
         try (Connection connection = getConnection()) {
@@ -219,7 +219,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
         }
     }
     @Override
-    public void createTable(int sid, String tableName)
+    public void createTable(final int sid, final String tableName)
             throws SQLException {
         logger.info(String.format("Creating table from temp_table for sid %d and tablename %s", sid, tableName));
 
@@ -243,7 +243,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
     }
     
     @Override
-    public void createTempTable(String query, int sid, String tableName)
+    public void createTempTable(final String query, final int sid, final String tableName)
             throws SQLException {
 
         logger.info(String.format("Creating temp table for sid %d and table %s", sid, tableName));
@@ -266,7 +266,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
     }
     
     @Override
-    public void insertIntoTempTable(String query, int sid, String tableName)
+    public void insertIntoTempTable(final String query, final int sid, final String tableName)
             throws SQLException {
 
         logger.info(String.format("Inserting into temp table temp_%s for sid %d", tableName, sid));
@@ -289,7 +289,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
     }
     
     @Override
-    public void createOriginalTable(String query, int sid, String tableName)
+    public void createOriginalTable(final String query, final int sid, final String tableName)
             throws SQLException {
 
         logger.info(String.format("Creating table for sid %d and table %s", sid, tableName));
@@ -312,7 +312,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
     }
     
     @Override
-    public void insertIntoTable(String query, int sid, String tableName)
+    public void insertIntoTable(final String query, final int sid, final String tableName)
             throws SQLException {
 
         logger.info(String.format("Inserting into table temp_%s for sid %d", tableName, sid));
@@ -372,13 +372,13 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
 //        }
 //    }
     @Override
-    public void importCsvToTable(String dir, String tableName) throws SQLException {
+    public void importCsvToTable(final String dir, final String tableName) throws SQLException {
         
         logger.info(String.format("Importing from %s to table %s", dir, tableName));
 
         try (Connection connection = getConnection()) {
 
-            String sql = String.format("load data infile '%s' into table %s  fields terminated by ','  optionally enclosed by '\"' escaped by '\"' lines terminated by '\\r\\n'", dir, tableName);
+            String sql = String.format("LOAD DATA LOCAL INFILE '%s' into table %s  fields terminated by ','  optionally enclosed by '\"' escaped by '\"' lines terminated by '\\r\\n'", dir, tableName);
 
             try (Statement statement = connection.createStatement()) {
             System.out.println("****************");
@@ -397,7 +397,7 @@ public class MySQLDatabaseHandler extends DatabaseHandler {
         }
     }
     
-    private String getSql(String tableName, ArrayList<String> columnNames) {
+    private String getSql(final String tableName, final ArrayList<String> columnNames) {
         String sql = "insert into " + tableName + " values (";
         String values = "";
         int size = columnNames.size();
