@@ -16,8 +16,10 @@ import org.json.JSONWriter;
 
 import com.google.refine.commands.Command;
 
-import edu.pitt.sis.exp.colfusion.dao.MetadataDbHandler;
-import edu.pitt.sis.exp.colfusion.dao.TargetDatabaseHandlerFactory;
+
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.TargetDatabaseHandlerFactory;
+
 
 
 public class IsHistoryShownCommand extends Command {
