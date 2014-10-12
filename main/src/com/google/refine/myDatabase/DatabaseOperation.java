@@ -8,9 +8,9 @@ import java.util.List;
 import com.google.refine.model.Column;
 import com.google.refine.model.Project;
 
-import edu.pitt.sis.exp.colfusion.dao.DatabaseHandler;
-import edu.pitt.sis.exp.colfusion.dao.MetadataDbHandler;
-import edu.pitt.sis.exp.colfusion.dao.TargetDatabaseHandlerFactory;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandler;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.TargetDatabaseHandlerFactory;
 
 /**
  * @author xxl
