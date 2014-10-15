@@ -45,7 +45,7 @@ import com.google.refine.ProjectManager;
 import com.google.refine.history.Change;
 import com.google.refine.model.Project;
 import com.google.refine.model.Row;
-import com.google.refine.myDatabase.DatabaseOperation;
+
 import com.google.refine.util.Pool;
 
 public class RowRemovalChange implements Change {

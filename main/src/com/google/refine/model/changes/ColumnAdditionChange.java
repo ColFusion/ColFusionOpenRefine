@@ -47,7 +47,7 @@ import com.google.refine.model.Column;
 import com.google.refine.model.ColumnGroup;
 import com.google.refine.model.Project;
 import com.google.refine.model.Row;
-import com.google.refine.myDatabase.DatabaseOperation;
+//import com.google.refine.myDatabase.DatabaseOperation;
 import com.google.refine.util.Pool;
 
 public class ColumnAdditionChange extends ColumnChange {

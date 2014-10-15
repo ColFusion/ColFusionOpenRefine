@@ -49,7 +49,7 @@ import com.google.refine.model.Column;
 import com.google.refine.model.Project;
 import com.google.refine.model.ReconStats;
 import com.google.refine.model.recon.ReconConfig;
-import com.google.refine.myDatabase.DatabaseOperation;
+
 import com.google.refine.util.ParsingUtilities;
 import com.google.refine.util.Pool;
 

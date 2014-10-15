@@ -46,7 +46,7 @@ import com.google.refine.model.Column;
 import com.google.refine.model.Project;
 import com.google.refine.util.Pool;
 
-import com.google.refine.myDatabase.DatabaseOperation;
+
 
 public class CellChange implements Change {
     final public int     row;
