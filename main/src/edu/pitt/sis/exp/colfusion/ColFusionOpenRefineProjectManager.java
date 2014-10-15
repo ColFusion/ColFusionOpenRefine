@@ -52,9 +52,11 @@ import com.google.refine.model.ModelException;
 import com.google.refine.model.Project;
 import com.google.refine.model.Row;
 
-import edu.pitt.sis.exp.colfusion.dao.DatabaseHandler;
-import edu.pitt.sis.exp.colfusion.dao.MetadataDbHandler;
-import edu.pitt.sis.exp.colfusion.dao.TargetDatabaseHandlerFactory;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandler;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerBase;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.TargetDatabaseHandlerFactory;
+
 
 /**
  * @author xxl
@@ -84,7 +86,7 @@ public class ColFusionOpenRefineProjectManager {
         // DatabaseConnectionInfo databaseConnectionInfo = new
         // DatabaseConnectionInfo("127.0.0.1", 3306, "root", "",
         // "colfusion_filetodb_")
-        DatabaseHandler databaseHandler = TargetDatabaseHandlerFactory.getTargetDatabaseHandler(sid);
+        DatabaseHandlerBase databaseHandler = TargetDatabaseHandlerFactory.getTargetDatabaseHandler(sid);
 
         MetadataDbHandler metadataDbHandler = TargetDatabaseHandlerFactory.getMetadataDbHandler();
 
@@ -156,7 +158,7 @@ public class ColFusionOpenRefineProjectManager {
         return url;
     }
 
-    private void setProject(int sid, Project project, DatabaseHandler dbHandler,
+    private void setProject(int sid, Project project, DatabaseHandlerBase dbHandler,
             MetadataDbHandler metadataDbHandler)
             throws SQLException {
         // Get and set column names
