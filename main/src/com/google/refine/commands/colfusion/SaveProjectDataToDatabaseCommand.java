@@ -25,10 +25,9 @@ import com.google.refine.commands.Command;
 import com.google.refine.model.Project;
 
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandler;
-
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerBase;
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.TargetDatabaseHandlerFactory;
-
 import edu.pitt.sis.exp.colfusion.utils.CSVUtils;
 
 /**
@@ -64,7 +63,7 @@ public class SaveProjectDataToDatabaseCommand extends Command {
         
 
         MetadataDbHandler metadataDbHandler = TargetDatabaseHandlerFactory.getMetadataDbHandler();
-        DatabaseHandler databaseHandler = null;
+        DatabaseHandlerBase databaseHandler = null;
 
         try {
             sid = metadataDbHandler.getSid(String.valueOf(projectId));
