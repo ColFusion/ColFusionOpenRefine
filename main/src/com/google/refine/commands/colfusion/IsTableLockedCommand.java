@@ -18,7 +18,7 @@ import com.google.refine.util.ParsingUtilities;
 
 
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
-import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.TargetDatabaseHandlerFactory;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
 
 
 /**
@@ -41,7 +41,7 @@ public class IsTableLockedCommand extends Command {
         
         Properties parameters = ParsingUtilities.parseUrlParameters(request);
 
-        MetadataDbHandler metadataDbHandler = TargetDatabaseHandlerFactory.getMetadataDbHandler(); // colfusion
+        MetadataDbHandler metadataDbHandler = DatabaseHandlerFactory.getMetadataDbHandler(); // colfusion
                                                                                                    // db
 
         int sid = Integer.valueOf(parameters.getProperty("sid"));

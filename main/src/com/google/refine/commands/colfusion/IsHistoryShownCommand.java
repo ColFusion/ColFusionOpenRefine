@@ -18,7 +18,7 @@ import com.google.refine.commands.Command;
 
 
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
-import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.TargetDatabaseHandlerFactory;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
 
 
 
@@ -59,7 +59,7 @@ public class IsHistoryShownCommand extends Command {
             notSavedChangesLength = notSavedChanges.length;
         }
         
-        MetadataDbHandler metadataDbHandler = TargetDatabaseHandlerFactory.getMetadataDbHandler(); // colfusion db
+        MetadataDbHandler metadataDbHandler = DatabaseHandlerFactory.getMetadataDbHandler(); // colfusion db
         int count = -1;
         
         try {

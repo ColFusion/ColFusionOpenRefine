@@ -17,7 +17,7 @@ import com.google.refine.util.ParsingUtilities;
 
 
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
-import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.TargetDatabaseHandlerFactory;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
 
 
 /**
@@ -36,7 +36,7 @@ public class ReleaseTableCommand extends Command {
         String tableName = parameters.getProperty("tableName");
         int colfusionUserId = Integer.valueOf(parameters.getProperty("userId"));
         
-        MetadataDbHandler metadataDbHandler = TargetDatabaseHandlerFactory.getMetadataDbHandler();
+        MetadataDbHandler metadataDbHandler = DatabaseHandlerFactory.getMetadataDbHandler();
         
         JSONObject result = new JSONObject();
 

@@ -24,17 +24,18 @@ import com.google.refine.ProjectManager;
 import com.google.refine.commands.Command;
 import com.google.refine.model.Project;
 
-import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandler;
+//import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandler;
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerBase;
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
-import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.TargetDatabaseHandlerFactory;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
+//import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.TargetDatabaseHandlerFactory;
 import edu.pitt.sis.exp.colfusion.utils.CSVUtils;
 
 /**
  * @author xxl
  * 
  */
-public class SaveProjectDataToDatabaseCommand extends Command {
+public class SaveProjectDataToDatabaseCommand extends Command  {
 
     /*
      * By using this function, the
@@ -62,14 +63,19 @@ public class SaveProjectDataToDatabaseCommand extends Command {
         
         
 
-        MetadataDbHandler metadataDbHandler = TargetDatabaseHandlerFactory.getMetadataDbHandler();
+        MetadataDbHandler metadataDbHandler = DatabaseHandlerFactory.getMetadataDbHandler();
         DatabaseHandlerBase databaseHandler = null;
 
         try {
             sid = metadataDbHandler.getSid(String.valueOf(projectId));
-            databaseHandler = TargetDatabaseHandlerFactory.getTargetDatabaseHandler(sid);
+            try {
+                databaseHandler = DatabaseHandlerFactory.getTargetDatabaseHandler(sid);
+            } catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             tableName = metadataDbHandler.getTableName(sid);
-        } catch (SQLException | ClassNotFoundException e1) {
+        } catch (SQLException  e1) {
             e1.printStackTrace();
         }
 

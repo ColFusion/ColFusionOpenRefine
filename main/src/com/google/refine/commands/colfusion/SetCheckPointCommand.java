@@ -25,8 +25,10 @@ import com.google.refine.model.Project;
 import com.google.refine.util.ParsingUtilities;
 
 
+
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
-import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.TargetDatabaseHandlerFactory;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
+//import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.TargetDatabaseHandlerFactory;
 
 
 public class SetCheckPointCommand extends Command {
@@ -42,7 +44,7 @@ public class SetCheckPointCommand extends Command {
 
         Properties parameters = ParsingUtilities.parseUrlParameters(request);
 
-        MetadataDbHandler metadataDbHandler = TargetDatabaseHandlerFactory.getMetadataDbHandler();
+        MetadataDbHandler metadataDbHandler = DatabaseHandlerFactory.getMetadataDbHandler();
         
         String url = parameters.getProperty("url");
         Long projectId = Long.valueOf(getProjectId(url));

@@ -17,7 +17,7 @@ import com.google.refine.commands.Command;
 import com.google.refine.util.ParsingUtilities;
 
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
-import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.TargetDatabaseHandlerFactory;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
 
 /**
  * @author xxl
@@ -38,7 +38,7 @@ public class IsChangesSavedCommand extends Command {
         int sid = Integer.valueOf(parameters.getProperty("sid"));
         String tableName = parameters.getProperty("tableName");
         
-        MetadataDbHandler metadataDbHandler = TargetDatabaseHandlerFactory.getMetadataDbHandler();
+        MetadataDbHandler metadataDbHandler = DatabaseHandlerFactory.getMetadataDbHandler();
         
         String projectId;
         JSONObject result = new JSONObject();
