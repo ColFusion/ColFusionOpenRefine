@@ -3,23 +3,22 @@ package com.google.refine.commands.colfusion;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.refine.commands.Command;
 import com.google.refine.util.ParsingUtilities;
-import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
+
 import edu.pitt.sis.exp.colfusion.ColFusionOpenRefineProjectManager;
 //import edu.pitt.sis.exp.colfusion.dao.MetadataDbHandler;
 //import edu.pitt.sis.exp.colfusion.dao.TargetDatabaseHandlerFactory;
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
 
 
 /**
@@ -29,7 +28,7 @@ import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
 public class CreateProjectFromColfusionStoryCommand extends Command {
 
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
         
         Properties p = new Properties();
         String fileName="/ColFusionOpenRefine.properties";
@@ -60,14 +59,12 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
                 metadataDbHandler.updateOpenRefineHistoryHelper(sid, tableName, 0, isSaved);
             }
             
-            
             JSONObject result = new JSONObject();
     
             boolean isTimeOut = false;
             boolean isTableLocked = metadataDbHandler.isTableLocked(sid, tableName);
             boolean isEditingByCurrentUser = false;
-            
-    
+                
             if (isTableLocked) {
                 isEditingByCurrentUser = metadataDbHandler.isBeingEditedByCurrentUser(sid, tableName, userId);
                 if (metadataDbHandler.isTimeOut(sid, tableName, lockTime)) {
@@ -85,8 +82,6 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
     
                 ColFusionOpenRefineProjectManager colFusionOpenRefineProjectManager = new ColFusionOpenRefineProjectManager();
                 result.put("openrefineURL", colFusionOpenRefineProjectManager.createProjectToOpenRefine(sid, tableName));
-            
-                
             }
             result.put("isEditing", isTableLocked && !isEditingByCurrentUser);
             result.put("isTimeOut", isTimeOut);
@@ -98,15 +93,8 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
             response.setCharacterEncoding("UTF-8");
             response.setHeader("Content-Type", "application/json");
             respond(response, result.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-    
-        }}
-    
-
+        } catch (Exception e) {
+            respondException(response, e);
+        }
+    }
 }

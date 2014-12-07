@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -17,7 +16,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONException;
 import org.json.JSONWriter;
 
 import com.google.refine.ProjectManager;
@@ -26,8 +24,8 @@ import com.google.refine.model.Project;
 
 //import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandler;
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerBase;
-import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
 //import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.TargetDatabaseHandlerFactory;
 import edu.pitt.sis.exp.colfusion.utils.CSVUtils;
 
@@ -45,44 +43,35 @@ public class SaveProjectDataToDatabaseCommand extends Command  {
     @Override
     public void doPost(final HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException {
-
-        Properties p = new Properties();
-        String fileName = "/ColFusionOpenRefine.properties";
-        InputStream in = SaveProjectDataToDatabaseCommand.class.getResourceAsStream(fileName);
-        p.load(in);
-        in.close();
-        
-        int lockTime = Integer.valueOf(p.getProperty("lock_time"));
-
-        long projectId = Long.parseLong(request.getParameter("projectId"));
-        String colfusionUserId = request.getParameter("colfusionUserId");
-        int sid = -1;
-        String tableName = "";
-
-        String msg = "";
-        
-        
-
-        MetadataDbHandler metadataDbHandler = DatabaseHandlerFactory.getMetadataDbHandler();
-        DatabaseHandlerBase databaseHandler = null;
-
         try {
+        
+            Properties p = new Properties();
+            String fileName = "/ColFusionOpenRefine.properties";
+            InputStream in = SaveProjectDataToDatabaseCommand.class.getResourceAsStream(fileName);
+            p.load(in);
+            in.close();
+            
+            int lockTime = Integer.valueOf(p.getProperty("lock_time"));
+    
+            long projectId = Long.parseLong(request.getParameter("projectId"));
+            String colfusionUserId = request.getParameter("colfusionUserId");
+            int sid = -1;
+            String tableName = "";
+    
+            String msg = "";
+            
+            MetadataDbHandler metadataDbHandler = DatabaseHandlerFactory.getMetadataDbHandler();
+            DatabaseHandlerBase databaseHandler = null;
+       
             sid = metadataDbHandler.getSid(String.valueOf(projectId));
-            try {
-                databaseHandler = DatabaseHandlerFactory.getTargetDatabaseHandler(sid);
-            } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+           
+            databaseHandler = DatabaseHandlerFactory.getTargetDatabaseHandler(sid);
             tableName = metadataDbHandler.getTableName(sid);
-        } catch (SQLException  e1) {
-            e1.printStackTrace();
-        }
-
-        try {
+        
             if (metadataDbHandler.isTimeOutForCurrentUser(sid, tableName, Integer.valueOf(colfusionUserId), lockTime)) {
                 msg = "Time is out, cannot save!";
-            } else {
+            } 
+            else {
                 int count = metadataDbHandler.getCountFromOpenRefineHistoryHelper(sid, tableName);
                 metadataDbHandler.updateOpenRefineHistoryHelper(sid, tableName, count, 1);
                 /*
@@ -119,11 +108,9 @@ public class SaveProjectDataToDatabaseCommand extends Command  {
                  * ****************Save data into database*****************
                  */
                 // 0. Remove original table
-                try {
-                    databaseHandler.removeTable(sid, tableName);
-                } catch (SQLException e2) {
-                    e2.printStackTrace();
-                }
+               
+                databaseHandler.removeTable(sid, tableName);
+               
                 // 1. Create table
                 String tableCreateQuery = "CREATE TABLE " + tableName + " (";
                 for (int i = 0; i < columnNames.size(); i++) {
@@ -133,31 +120,10 @@ public class SaveProjectDataToDatabaseCommand extends Command  {
                         tableCreateQuery += headlineControl(columnNames.get(i)) + " VARCHAR(255))";
                     }
                 }
-                try {
-                    databaseHandler.createOriginalTable(tableCreateQuery, sid, tableName);
-                } catch (SQLException e1) {
-                    e1.printStackTrace();
-                }
+                
+                databaseHandler.createOriginalTable(tableCreateQuery, sid, tableName);
+               
 
-                // 2. Insert rows into table
-//                databaseHandler.insertIntoTable(sid, tableName, rows, columnNames);
-//                String insertQuery = "INSERT INTO " + tableName + " VALUES('";
-//                for (int j = 0; j < rows.size(); j++) {
-//                    for (int k = 0; k < columnNames.size(); k++) {
-//                        if (k < columnNames.size() - 1) {
-//                            insertQuery += rows.get(j).get(k) + "','";
-//                        } else {
-//                            insertQuery += rows.get(j).get(k) + "')";
-//                        }
-//                    }
-//                    insertQuery = insertQuery.replaceAll("\n", "");
-//                    try {
-//                        databaseHandler.insertIntoTable(insertQuery, sid, tableName);
-//                    } catch (SQLException e) {
-//                        e.printStackTrace();
-//                    }
-//                    insertQuery = "INSERT INTO " + tableName + " VALUES('";
-//                }
                 /*
                  * *************test csv begin**********************
                  */
@@ -184,73 +150,26 @@ public class SaveProjectDataToDatabaseCommand extends Command  {
                 } else {
                     logger.info("csv saving failed!");
                 }
-                /*
-                 * *************test csv end****************
-                 */
-                /*
-                 * ********************************************************
-                 */
 
                 ArrayList<Integer> cids;
-//                try {
-//                    /*
-//                     * Update columns information in colfusion_dnameinfo
-//                     */
-//                    cids = metadataDbHandler.getCidsBySid(sid);
-//                    // 1. Remove all the rows which's sid is Sid
-//                    metadataDbHandler.deleteDnameinfoRowsBySid(sid);
-//                    // 2. Add columns into the table
-//                    for (int k = 0; k < columnNames.size(); k++) {
-//                        String addRows = String
-//                                .format("INSERT INTO colfusion_dnameinfo VALUES(NULL, %d, '%s', 'String', NULL, NULL, NULL, '%s', b'0', NULL, NULL)",
-//                                        sid, columnNames.get(k), columnNames.get(k));
-//                        metadataDbHandler.insertIntoDnameinfo(addRows, sid);
-//                    }
-//
-//                    /*
-//                     * Update columns information in colfusion_columnTableInfo
-//                     */
-//                    // 1. Remove all the rows which's cid is cid
-//                    for (int j = 0; j < cids.size(); j++) {
-//                        String getOriginalCids = String.format("DELETE FROM colfusion_columnTableInfo WHERE cid = %d",
-//                                cids.get(j));
-//                        metadataDbHandler.deleteColumninfoRowsByCid(getOriginalCids, cids.get(j));
-//                    }
-//                    // 2. Add all new added columns
-//                    ArrayList<Integer> newCids = metadataDbHandler.getCidsBySid(sid);
-//
-//                    for (int n = 0; n < newCids.size(); n++) {
-//                        String addColumns = String.format("INSERT INTO colfusion_columnTableInfo VALUES(%d, '%s')",
-//                                newCids.get(n), tableName);
-//                        metadataDbHandler.insertIntoColumninfo(addColumns, tableName);
-//                    }
-
                     msg = "Changes have been saved!";
-//                } catch (SQLException e1) {
-//                    e1.printStackTrace();
-//                }
-
             }
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        Writer w = response.getWriter();
-        JSONWriter writer = new JSONWriter(w);
-        try {
+       
+            Writer w = response.getWriter();
+            JSONWriter writer = new JSONWriter(w);
+       
             writer.object();
 
             writer.key("msg");
             writer.value(msg);
             writer.endObject();
-        } catch (JSONException e) {
-            throw new ServletException(e);
-        } finally {
-            w.flush();
-            w.close();
+        } catch (Exception e) {
+            respondException(response, e);
         }
+//        finally {
+//            w.flush();
+//            w.close();
+//        }
     }
 
     public static String headlineControl(final String str) {
@@ -398,13 +317,14 @@ public class SaveProjectDataToDatabaseCommand extends Command  {
         }  
         path.delete();  
     }
-     private String removeSpace(final String str) {
-         String result = "";
-         for(int i = 0; i < str.length(); i++) {
-             if(str.charAt(i) != ' ') {
-                 result += str.charAt(i);
-             }
-         }
-         return result;
-     }
+    
+    private String removeSpace(final String str) {
+        String result = "";
+        for(int i = 0; i < str.length(); i++) {
+            if(str.charAt(i) != ' ') {
+                result += str.charAt(i);
+            }
+        }
+        return result;
+    }
 }
