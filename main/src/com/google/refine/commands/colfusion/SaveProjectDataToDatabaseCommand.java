@@ -35,6 +35,9 @@ import edu.pitt.sis.exp.colfusion.utils.CSVUtils;
  */
 public class SaveProjectDataToDatabaseCommand extends Command  {
 
+    private static final String PROPERTY_CSV_FILE_NAME = "csv_file_name";
+    private static final String PROPERTY_CSV_FILE_DIR = "csv_file_dir";
+
     /*
      * By using this function, the
      * com.google.refine.myDatabase.DatabaseOperation will not be used anymore,
@@ -100,30 +103,31 @@ public class SaveProjectDataToDatabaseCommand extends Command  {
                     columnNames.add(s);
                 }
 
-                // Get each row from project
-                ArrayList<ArrayList<String>> rows = new ArrayList<>();
-                rows = getReorderedRows(project);
-
-                /*
+                                /*
                  * ****************Save data into database*****************
                  */
                 // 0. Remove original table
                
-                databaseHandler.removeTable(sid, tableName);
+                databaseHandler.removeTable(tableName);
                
-                // 1. Create table
-                String tableCreateQuery = "CREATE TABLE " + tableName + " (";
-                for (int i = 0; i < columnNames.size(); i++) {
-                    if (i < columnNames.size() - 1) {
-                        tableCreateQuery += headlineControl(columnNames.get(i)) + " VARCHAR(255), ";
-                    } else {
-                        tableCreateQuery += headlineControl(columnNames.get(i)) + " VARCHAR(255))";
-                    }
-                }
+//                // 1. Create table
+//                String tableCreateQuery = "CREATE TABLE " + tableName + " (";
+//                for (int i = 0; i < columnNames.size(); i++) {
+//                    if (i < columnNames.size() - 1) {
+//                        tableCreateQuery += headlineControl(columnNames.get(i)) + " VARCHAR(255), ";
+//                    } else {
+//                        tableCreateQuery += headlineControl(columnNames.get(i)) + " VARCHAR(255))";
+//                    }
+//                }
                 
-                databaseHandler.createOriginalTable(tableCreateQuery, sid, tableName);
-               
+                databaseHandler.createTableIfNotExist(tableName, columnNames);
+                
+//                databaseHandler.createOriginalTable(tableCreateQuery, sid, tableName);
 
+                // Get each row from project
+                ArrayList<ArrayList<String>> rows = new ArrayList<>();
+                rows = getReorderedRows(project);
+                
                 /*
                  * *************test csv begin**********************
                  */
@@ -140,8 +144,8 @@ public class SaveProjectDataToDatabaseCommand extends Command  {
                     fileRows.add(tempRow);
                 }
                 
-                String csvDir = p.getProperty("csv_file_dir");
-                String csvFileName = p.getProperty("csv_file_name");
+                String csvDir = p.getProperty(PROPERTY_CSV_FILE_DIR);
+                String csvFileName = p.getProperty(PROPERTY_CSV_FILE_NAME);
                 
                 boolean isSuccess = CSVUtils.exportCsv(new File(dir + projectDir + csvFileName), fileRows);
                 
@@ -170,11 +174,6 @@ public class SaveProjectDataToDatabaseCommand extends Command  {
 //            w.flush();
 //            w.close();
 //        }
-    }
-
-    public static String headlineControl(final String str) {
-        String result = "`" + str + "`";
-        return result;
     }
 
     public static ArrayList<ArrayList<String>> getReorderedRows(final Project project) {
