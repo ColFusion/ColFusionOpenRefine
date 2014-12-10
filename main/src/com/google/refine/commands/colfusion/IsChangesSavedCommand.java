@@ -2,7 +2,6 @@ package com.google.refine.commands.colfusion;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -16,8 +15,10 @@ import org.json.JSONObject;
 import com.google.refine.commands.Command;
 import com.google.refine.util.ParsingUtilities;
 
-import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
+import edu.pitt.sis.exp.colfusion.utils.ConfigManager;
+import edu.pitt.sis.exp.colfusion.utils.PropertyKeys;
 
 /**
  * @author xxl
@@ -27,12 +28,7 @@ public class IsChangesSavedCommand extends Command {
     @Override
     public void doGet(final HttpServletRequest request, final HttpServletResponse response)
             throws IOException, ServletException {
-        Properties p = new Properties();
-        String fileName = "/ColFusionOpenRefine.properties";
-        InputStream in = SaveProjectDataToDatabaseCommand.class.getResourceAsStream(fileName);
-        p.load(in);
-        in.close();
-        
+               
         Properties parameters = ParsingUtilities.parseUrlParameters(request);
 
         int sid = Integer.valueOf(parameters.getProperty("sid"));
@@ -48,8 +44,9 @@ public class IsChangesSavedCommand extends Command {
         try {
             projectId = metadataDbHandler.getProjectId(sid, tableName);
             
-            String dir = p.getProperty("file_dir");
-            String tempFolder = p.getProperty("temp_folder");
+            ConfigManager configMng = ConfigManager.getInstance();
+            String dir = configMng.getProperty(PropertyKeys.COLFUSION_OPENREFINE_FOLDER);
+            String tempFolder = configMng.getProperty(PropertyKeys.COLFUSION_OPENREFINE_FOLDER_TEMP);
             
             String tempDir = dir + tempFolder + File.separator;
             String projectDir = projectId + ".project" + File.separator;
@@ -81,6 +78,5 @@ public class IsChangesSavedCommand extends Command {
         response.setCharacterEncoding("UTF-8");
         response.setHeader("Content-Type", "application/json");
         respond(response, result.toString());
-
     }
 }

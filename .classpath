@@ -91,5 +91,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/colfusionserverdal"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/colfusionserverutils"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

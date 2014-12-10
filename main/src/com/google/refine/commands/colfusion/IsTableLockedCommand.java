@@ -2,7 +2,6 @@
 package com.google.refine.commands.colfusion;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -16,9 +15,10 @@ import org.json.JSONObject;
 import com.google.refine.commands.Command;
 import com.google.refine.util.ParsingUtilities;
 
-
-import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
+import edu.pitt.sis.exp.colfusion.utils.ConfigManager;
+import edu.pitt.sis.exp.colfusion.utils.PropertyKeys;
 
 
 /**
@@ -28,16 +28,10 @@ import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
 public class IsTableLockedCommand extends Command {
 
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response)
+    public void doGet(final HttpServletRequest request, final HttpServletResponse response)
             throws IOException, ServletException {
 
-        Properties p = new Properties();
-        String fileName="/ColFusionOpenRefine.properties";
-        InputStream in = IsTableLockedCommand.class.getResourceAsStream(fileName);
-        p.load(in);  
-        in.close();
-        
-        int lockTime = Integer.valueOf(p.getProperty("lock_time"));
+        int lockTime = Integer.valueOf(ConfigManager.getInstance().getProperty(PropertyKeys.COLFUSION_OPENREFINE_LOCK_TIME));
         
         Properties parameters = ParsingUtilities.parseUrlParameters(request);
 
@@ -80,6 +74,5 @@ public class IsTableLockedCommand extends Command {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 }

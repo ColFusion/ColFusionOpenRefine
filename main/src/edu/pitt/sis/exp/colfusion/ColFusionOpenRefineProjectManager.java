@@ -34,10 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package edu.pitt.sis.exp.colfusion;
 
 import java.io.File;
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +54,8 @@ import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerBase;
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
 //import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.TargetDatabaseHandlerFactory;
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
+import edu.pitt.sis.exp.colfusion.utils.ConfigManager;
+import edu.pitt.sis.exp.colfusion.utils.PropertyKeys;
 
 
 /**
@@ -70,15 +70,9 @@ public class ColFusionOpenRefineProjectManager {
             throws Exception {
         ProjectManager.singleton.setBusy(true);
         String url = "";
-
-        Properties p = new Properties();
-        String fileName="/ColFusionOpenRefine.properties";
-        InputStream in = ColFusionOpenRefineProjectManager.class.getResourceAsStream(fileName);
-        p.load(in);  
-        in.close();
         
-        String fileDir = p.getProperty("file_dir");
-        String openrefineUrl = p.getProperty("openrefine_link");
+        String fileDir = ConfigManager.getInstance().getProperty(PropertyKeys.COLFUSION_OPENREFINE_FOLDER);
+        String openrefineUrl = ConfigManager.getInstance().getProperty(PropertyKeys.COLFUSION_OPENREFINE_URL);
         System.out.println("************************************************");
         System.out.println("OpenRefineUrl: " + openrefineUrl);
         System.out.println("************************************************");

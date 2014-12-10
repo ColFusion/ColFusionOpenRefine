@@ -2,7 +2,6 @@
 package com.google.refine.commands.colfusion;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 import javax.servlet.ServletException;
@@ -19,6 +18,8 @@ import edu.pitt.sis.exp.colfusion.ColFusionOpenRefineProjectManager;
 //import edu.pitt.sis.exp.colfusion.dao.TargetDatabaseHandlerFactory;
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
+import edu.pitt.sis.exp.colfusion.utils.ConfigManager;
+import edu.pitt.sis.exp.colfusion.utils.PropertyKeys;
 
 
 /**
@@ -30,13 +31,7 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
     @Override
     public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
         
-        Properties p = new Properties();
-        String fileName="/ColFusionOpenRefine.properties";
-        InputStream in = CreateProjectFromColfusionStoryCommand.class.getResourceAsStream(fileName);
-        p.load(in);  
-        in.close();
-        
-        int lockTime = Integer.valueOf(p.getProperty("lock_time"));
+        int lockTime = Integer.valueOf(ConfigManager.getInstance().getProperty(PropertyKeys.COLFUSION_OPENREFINE_LOCK_TIME));
         
         Properties parameters = ParsingUtilities.parseUrlParameters(request);
         /*

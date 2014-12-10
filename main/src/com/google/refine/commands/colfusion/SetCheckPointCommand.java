@@ -24,11 +24,11 @@ import com.google.refine.io.FileProjectManager;
 import com.google.refine.model.Project;
 import com.google.refine.util.ParsingUtilities;
 
-
-
-import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
 //import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.TargetDatabaseHandlerFactory;
+import edu.pitt.sis.exp.colfusion.utils.ConfigManager;
+import edu.pitt.sis.exp.colfusion.utils.PropertyKeys;
 
 
 public class SetCheckPointCommand extends Command {
@@ -36,11 +36,6 @@ public class SetCheckPointCommand extends Command {
     @Override
     public void doGet(final HttpServletRequest request, final HttpServletResponse response)
             throws IOException, ServletException {
-        Properties p = new Properties();
-        String fileName = "/ColFusionOpenRefine.properties";
-        InputStream in = SaveProjectDataToDatabaseCommand.class.getResourceAsStream(fileName);
-        p.load(in);
-        in.close();
 
         Properties parameters = ParsingUtilities.parseUrlParameters(request);
 
@@ -60,8 +55,10 @@ public class SetCheckPointCommand extends Command {
         Project project = FileProjectManager.singleton.getProject(projectId);
         int historyEntrySize = project.history.getLastPastEntries(0).size();
 
-        String dir = p.getProperty("file_dir");
-        String tempFolder = p.getProperty("temp_folder");
+        ConfigManager configMng = ConfigManager.getInstance();
+        
+        String dir = configMng.getProperty(PropertyKeys.COLFUSION_OPENREFINE_FOLDER);
+        String tempFolder = configMng.getProperty(PropertyKeys.COLFUSION_OPENREFINE_FOLDER_TEMP);
         
         String tempDir = dir + tempFolder + File.separator;
         String projectDir = projectId + ".project" + File.separator;

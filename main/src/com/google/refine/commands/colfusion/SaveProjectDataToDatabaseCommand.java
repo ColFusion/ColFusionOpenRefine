@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -28,15 +27,14 @@ import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
 //import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.TargetDatabaseHandlerFactory;
 import edu.pitt.sis.exp.colfusion.utils.CSVUtils;
+import edu.pitt.sis.exp.colfusion.utils.ConfigManager;
+import edu.pitt.sis.exp.colfusion.utils.PropertyKeys;
 
 /**
  * @author xxl
  * 
  */
 public class SaveProjectDataToDatabaseCommand extends Command  {
-
-    private static final String PROPERTY_CSV_FILE_NAME = "csv_file_name";
-    private static final String PROPERTY_CSV_FILE_DIR = "csv_file_dir";
 
     /*
      * By using this function, the
@@ -48,13 +46,9 @@ public class SaveProjectDataToDatabaseCommand extends Command  {
             throws ServletException, IOException {
         try {
         
-            Properties p = new Properties();
-            String fileName = "/ColFusionOpenRefine.properties";
-            InputStream in = SaveProjectDataToDatabaseCommand.class.getResourceAsStream(fileName);
-            p.load(in);
-            in.close();
+            ConfigManager configMng = ConfigManager.getInstance();
             
-            int lockTime = Integer.valueOf(p.getProperty("lock_time"));
+            int lockTime = Integer.valueOf(configMng.getProperty(PropertyKeys.COLFUSION_OPENREFINE_LOCK_TIME));
     
             long projectId = Long.parseLong(request.getParameter("projectId"));
             String colfusionUserId = request.getParameter("colfusionUserId");
@@ -81,8 +75,9 @@ public class SaveProjectDataToDatabaseCommand extends Command  {
                  * ***********update checkpoint************************
                  * Only the "Save" is valid, copy files to temp folder
                  */
-                String dir = p.getProperty("file_dir"); // + projectId + ".project";
-                String tempFolder = p.getProperty("temp_folder");
+                
+                String dir = configMng.getProperty(PropertyKeys.COLFUSION_OPENREFINE_FOLDER);
+                String tempFolder = configMng.getProperty(PropertyKeys.COLFUSION_OPENREFINE_FOLDER_TEMP);
                 
                 String tempDir = dir + tempFolder + File.separator;
                 String projectDir = projectId + ".project" + File.separator;
@@ -144,8 +139,8 @@ public class SaveProjectDataToDatabaseCommand extends Command  {
                     fileRows.add(tempRow);
                 }
                 
-                String csvDir = p.getProperty(PROPERTY_CSV_FILE_DIR);
-                String csvFileName = p.getProperty(PROPERTY_CSV_FILE_NAME);
+                String csvDir = ConfigManager.getInstance().getProperty(PropertyKeys.COLFUSION_OPENREFINE_CSV_FILE_DIR);
+                String csvFileName = ConfigManager.getInstance().getProperty(PropertyKeys.COLFUSION_OPENREFINE_CSV_FILE_NAME);
                 
                 boolean isSuccess = CSVUtils.exportCsv(new File(dir + projectDir + csvFileName), fileRows);
                 
@@ -264,7 +259,7 @@ public class SaveProjectDataToDatabaseCommand extends Command  {
         try {
             inStream = new FileInputStream(sourceZipFile);
         } catch (FileNotFoundException e) {
-            System.err.println("读取文件[" + sourceZipFile + "]发生错误" + "\r\n" + e.getCause());
+            System.err.println("" + sourceZipFile + "" + "\r\n" + e.getCause());
             return;
         }
         File targetFile = new File(targetZipFile);
