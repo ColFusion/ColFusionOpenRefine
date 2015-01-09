@@ -82,6 +82,12 @@
         <fileset dir="${webapp.lib.dir}">
             <include name="**/*.jar" />
         </fileset>
+    	<dirset dir="${basedir}/../ColFusionServer/ColFusionServerDAL" erroronmissingdir="false">
+    		<include name="**/*"/>
+    	</dirset>
+    	<dirset dir="${basedir}/../ColFusionServer/ColFusionServerUtils" erroronmissingdir="false">
+    		<include name="**/*"/>
+    	</dirset>
         <pathelement location="${webapp.classes.dir}"/>
     </path>
 
@@ -132,7 +138,7 @@
     <target name="build_webapp">
         <mkdir dir="${webapp.classes.dir}" />
         <javac source="${java_version}" target="${java_version}" encoding="utf-8" destdir="${webapp.classes.dir}" debug="true" includeAntRuntime="no">
-            <src path="${webapp.src.dir}"/>
+        	<src path="${webapp.src.dir}"/>
             <classpath refid="webapp.class.path" />
         </javac>
         <copy file="${webapp.src.dir}/log4j.properties" tofile="${webapp.classes.dir}/log4j.properties"/>
