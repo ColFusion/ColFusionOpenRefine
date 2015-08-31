@@ -97,6 +97,9 @@ public class Refine {
         // tell the signpost library to log
         //System.setProperty("debug","true");
         
+        System.setProperty("refine.headless","true");
+        System.setProperty("refine.data_dir", System.getProperty("user.dir") + File.separator + "workspace");
+        
         // set the log verbosity level
         org.apache.log4j.Logger.getRootLogger().setLevel(Level.toLevel(Configurations.get("refine.verbosity","info")));
 

@@ -682,12 +682,14 @@ run() {
         add_option "-Drefine.google_api_key=$REFINE_GOOGLE_API_KEY"
     fi
 
-    CLASSPATH="$REFINE_CLASSES_DIR${SEP}$REFINE_LIB_DIR/*"
+	COLFUSION_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )
+
+    CLASSPATH="$REFINE_CLASSES_DIR${SEP}$REFINE_LIB_DIR/*${SEP}$COLFUSION_DIR/ColfusionServer/ColFusionServerUtils/target/classes/${SEP}$COLFUSION_DIR/ColfusionServer/ColFusionServerDAL/target/classes/"
 
     RUN_CMD="$JAVA -cp $CLASSPATH $OPTS com.google.refine.Refine"
 
-    #echo "$RUN_CMD"
-    #echo ""
+    echo "$RUN_CMD"
+    echo ""
   
     echo "Starting OpenRefine at 'http://${REFINE_HOST}:${REFINE_PORT}/'"
     echo ""

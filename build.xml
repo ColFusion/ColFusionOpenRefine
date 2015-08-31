@@ -18,7 +18,8 @@
     <property name="build.dir" value="build"/>
     <property name="dist.dir" value="dist"/>
 
-    <property name="java_version" value="1.7"/>
+	
+    <property name="java_version" value="1.8"/>
 
     <property name="appengine.app_id" value="openrefine-broker"/>
     <property name="appengine.version" value="1"/>
@@ -128,6 +129,7 @@
     <!-- ================================================================== -->
 
     <target name="build_server">
+    	<echo message="Using Java version ${ant.java.version}."/>
         <mkdir dir="${server.classes.dir}" />
         <javac source="${java_version}" target="${java_version}" encoding="utf-8" srcdir="${server.src.dir}" destdir="${server.classes.dir}" debug="true" includeAntRuntime="no">
             <classpath refid="server.class.path" />

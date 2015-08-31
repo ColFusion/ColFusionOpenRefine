@@ -74,8 +74,10 @@ public class ColFusionOpenRefineProjectManager {
         String fileDir = ConfigManager.getInstance().getProperty(PropertyKeys.COLFUSION_OPENREFINE_FOLDER);
         String openrefineUrl = ConfigManager.getInstance().getProperty(PropertyKeys.COLFUSION_OPENREFINE_URL);
         System.out.println("************************************************");
-        System.out.println("OpenRefineUrl: " + openrefineUrl);
+        System.out.println("OpenRefineUrl PRINT: " + openrefineUrl);
         System.out.println("************************************************");
+        
+        System.out.println("BEFORE GET METADATA HANDLER");
         
         // DatabaseConnectionInfo databaseConnectionInfo = new
         // DatabaseConnectionInfo("127.0.0.1", 3306, "root", "",
@@ -84,6 +86,8 @@ public class ColFusionOpenRefineProjectManager {
 
         MetadataDbHandler metadataDbHandler = DatabaseHandlerFactory.getMetadataDbHandler();;
 
+        System.out.println("AFTER GET METADATA HANDLER");
+        
         try {
             /*
              * If there is no temp table, then backup original table to a temp_
