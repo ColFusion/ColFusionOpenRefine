@@ -8,7 +8,7 @@
     
 <project name="openrefine" default="build" basedir=".">
 
-    <!-- Properties are immutable, so anything set in this file takes priority-->
+	<!-- Properties are immutable, so anything set in this file takes priority-->
     <property file="build.properties"/>
     
     <property environment="env"/>
@@ -68,7 +68,7 @@
     <property name="linux.dir" value="${build.dir}/linux/${release.name}" />
     
     <!-- ================================================================== -->
-    
+	
     <path id="server.class.path">
         <fileset dir="${server.lib.dir}">
             <include name="**/*.jar" />
@@ -83,10 +83,10 @@
         <fileset dir="${webapp.lib.dir}">
             <include name="**/*.jar" />
         </fileset>
-    	<dirset dir="${basedir}/../ColFusionServer/ColFusionServerDAL" erroronmissingdir="false">
+    	<dirset dir="${basedir}/../ColFusionServer/ColFusionServerDAL" erroronmissingdir="true">
     		<include name="**/*"/>
     	</dirset>
-    	<dirset dir="${basedir}/../ColFusionServer/ColFusionServerUtils" erroronmissingdir="false">
+    	<dirset dir="${basedir}/../ColFusionServer/ColFusionServerUtils" erroronmissingdir="true">
     		<include name="**/*"/>
     	</dirset>
         <pathelement location="${webapp.classes.dir}"/>
@@ -145,7 +145,7 @@
         </javac>
         <copy file="${webapp.src.dir}/log4j.properties" tofile="${webapp.classes.dir}/log4j.properties"/>
     </target>
-
+	
     <target name="build_tests" depends="build">
         <mkdir dir="${server.tests.classes.dir}" />
         <javac source="${java_version}" target="${java_version}" encoding="utf-8" srcdir="${server.tests.src.dir}" destdir="${server.tests.classes.dir}" debug="true" includeAntRuntime="no">

@@ -24,3 +24,6 @@ broker/core/test-output/
 tmp/
 /test-output
 /workspace
+.classpath
+.project
+.settings

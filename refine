@@ -685,6 +685,8 @@ run() {
 	COLFUSION_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )
 
     CLASSPATH="$REFINE_CLASSES_DIR${SEP}$REFINE_LIB_DIR/*${SEP}$COLFUSION_DIR/ColfusionServer/ColFusionServerUtils/target/classes/${SEP}$COLFUSION_DIR/ColfusionServer/ColFusionServerDAL/target/classes/"
+    
+    #CLASSPATH="$REFINE_CLASSES_DIR${SEP}$REFINE_LIB_DIR/*${SEP}"
 
     RUN_CMD="$JAVA -cp $CLASSPATH $OPTS com.google.refine.Refine"
 
