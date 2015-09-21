@@ -68,6 +68,9 @@ import com.codeberry.jdatapath.DataPath;
 import com.codeberry.jdatapath.JDataPathSystem;
 import com.google.util.threads.ThreadPoolExecutorAdapter;
 
+import edu.pitt.sis.exp.colfusion.utils.ConfigManager;
+import edu.pitt.sis.exp.colfusion.utils.PropertyKeys;
+
 /**
  * Main class for Refine server application.  Starts an instance of the
  * Jetty HTTP server / servlet container (inner class Refine Server).
@@ -97,7 +100,11 @@ public class Refine {
 		//System.setProperty("debug","true");
 
 		//        System.setProperty("refine.headless","true");
-		System.setProperty("refine.data_dir", System.getProperty("user.dir") + File.separator + "workspace");
+		String fileDir = ConfigManager.getInstance().getProperty(PropertyKeys.COLFUSION_OPENREFINE_FOLDER);
+		if (fileDir == null || fileDir.isEmpty()) {
+			fileDir = System.getProperty("user.dir") + File.separator + "workspace";
+		}
+		System.setProperty("refine.data_dir", fileDir);
 
 		// set the log verbosity level
 		org.apache.log4j.Logger.getRootLogger().setLevel(Level.toLevel(Configurations.get("refine.verbosity","info")));
