@@ -15,64 +15,72 @@ import org.json.JSONObject;
 import com.google.refine.commands.Command;
 import com.google.refine.util.ParsingUtilities;
 
+import edu.pitt.sis.exp.colfusion.dal.dataModels.tableDataModel.RelationKey;
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
+import edu.pitt.sis.exp.colfusion.dal.managers.ColumnTableInfoManager;
+import edu.pitt.sis.exp.colfusion.dal.managers.ColumnTableInfoManagerImpl;
+import edu.pitt.sis.exp.colfusion.dal.orm.ColfusionColumnTableInfo;
 import edu.pitt.sis.exp.colfusion.utils.ConfigManager;
 import edu.pitt.sis.exp.colfusion.utils.PropertyKeys;
 
 
 /**
- * @author xxl
  *
  */
 public class IsTableLockedCommand extends Command {
 
-    @Override
-    public void doGet(final HttpServletRequest request, final HttpServletResponse response)
-            throws IOException, ServletException {
+	@Override
+	public void doGet(final HttpServletRequest request, final HttpServletResponse response)
+			throws IOException, ServletException {
 
-        int lockTime = Integer.valueOf(ConfigManager.getInstance().getProperty(PropertyKeys.COLFUSION_OPENREFINE_LOCK_TIME));
-        
-        Properties parameters = ParsingUtilities.parseUrlParameters(request);
+		final int lockTime = Integer.valueOf(ConfigManager.getInstance().getProperty(PropertyKeys.COLFUSION_OPENREFINE_LOCK_TIME));
 
-        MetadataDbHandler metadataDbHandler = DatabaseHandlerFactory.getMetadataDbHandler(); // colfusion
-                                                                                                   // db
+		final Properties parameters = ParsingUtilities.parseUrlParameters(request);
 
-        int sid = Integer.valueOf(parameters.getProperty("sid"));
-        String tableName = parameters.getProperty("tableName");
-        int userId = Integer.valueOf(parameters.getProperty("userId"));
-        try {
-            boolean isTimeOut = false;
-            boolean isTableBeingEditing = metadataDbHandler.isTableBeingEditing(sid, tableName);
-            boolean isEditingByCurrentUser = false;
-            boolean isTableLocked = false;
+		final MetadataDbHandler metadataDbHandler = DatabaseHandlerFactory.getMetadataDbHandler(); // colfusion
+		// db
 
-            JSONObject result = new JSONObject();
+		final int sid = Integer.valueOf(parameters.getProperty("sid"));
+		final String tableName = parameters.getProperty("tableName");
+		final int userId = Integer.valueOf(parameters.getProperty("userId"));
+		try {
 
-            String userLogin = "";
+			final ColumnTableInfoManager columnTableMng = new ColumnTableInfoManagerImpl();
+			final ColfusionColumnTableInfo columnTable = columnTableMng.findBySidAndOriginalTableName(sid, tableName);
+			final RelationKey relationKey = new RelationKey(tableName, columnTable.getDbTableName());
 
-            if (isTableBeingEditing) {
-                isEditingByCurrentUser = metadataDbHandler.isBeingEditedByCurrentUser(sid, tableName, userId);
-                if (metadataDbHandler.isTimeOut(sid, tableName, lockTime)) {
-                    isTimeOut = true;
-                }
-            }
-            if (!isEditingByCurrentUser && (isTableBeingEditing && !isTimeOut)) {
-                isTableLocked = true;
-                userLogin = metadataDbHandler.getUserLoginById(metadataDbHandler.getOperatingUserId(sid, tableName));
-            }
+			boolean isTimeOut = false;
+			final boolean isTableBeingEditing = metadataDbHandler.isTableBeingEditing(sid, tableName);
+			boolean isEditingByCurrentUser = false;
+			boolean isTableLocked = false;
 
-            result.put("userLogin", userLogin);
-            result.put("isTableLocked", isTableLocked);
-            result.put("successful", true);
+			final JSONObject result = new JSONObject();
 
-            response.setCharacterEncoding("UTF-8");
-            response.setHeader("Content-Type", "application/json");
-            respond(response, result.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+			String userLogin = "";
+
+			if (isTableBeingEditing) {
+				isEditingByCurrentUser = metadataDbHandler.isBeingEditedByCurrentUser(sid, relationKey, userId);
+				if (metadataDbHandler.isTimeOut(sid, relationKey, lockTime)) {
+					isTimeOut = true;
+				}
+			}
+			if (!isEditingByCurrentUser && (isTableBeingEditing && !isTimeOut)) {
+				isTableLocked = true;
+				userLogin = metadataDbHandler.getUserLoginById(metadataDbHandler.getOperatingUserId(sid, relationKey));
+			}
+
+			result.put("userLogin", userLogin);
+			result.put("isTableLocked", isTableLocked);
+			result.put("successful", true);
+
+			response.setCharacterEncoding("UTF-8");
+			response.setHeader("Content-Type", "application/json");
+			respond(response, result.toString());
+		} catch (final JSONException e) {
+			e.printStackTrace();
+		} catch (final SQLException e) {
+			e.printStackTrace();
+		}
+	}
 }

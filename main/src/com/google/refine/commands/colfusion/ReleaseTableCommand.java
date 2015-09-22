@@ -15,9 +15,12 @@ import org.json.JSONObject;
 import com.google.refine.commands.Command;
 import com.google.refine.util.ParsingUtilities;
 
-
-import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
+import edu.pitt.sis.exp.colfusion.dal.dataModels.tableDataModel.RelationKey;
 import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
+import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.MetadataDbHandler;
+import edu.pitt.sis.exp.colfusion.dal.managers.ColumnTableInfoManager;
+import edu.pitt.sis.exp.colfusion.dal.managers.ColumnTableInfoManagerImpl;
+import edu.pitt.sis.exp.colfusion.dal.orm.ColfusionColumnTableInfo;
 
 
 /**
@@ -26,34 +29,38 @@ import edu.pitt.sis.exp.colfusion.dal.databaseHandlers.DatabaseHandlerFactory;
  */
 public class ReleaseTableCommand extends Command {
 
-    @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
+	@Override
+	public void doGet(final HttpServletRequest request, final HttpServletResponse response)
+			throws IOException, ServletException {
 
-        Properties parameters = ParsingUtilities.parseUrlParameters(request);
+		final Properties parameters = ParsingUtilities.parseUrlParameters(request);
 
-        int sid = Integer.valueOf(parameters.getProperty("sid"));
-        String tableName = parameters.getProperty("tableName");
-        int colfusionUserId = Integer.valueOf(parameters.getProperty("userId"));
-        
-        MetadataDbHandler metadataDbHandler = DatabaseHandlerFactory.getMetadataDbHandler();
-        
-        JSONObject result = new JSONObject();
+		final int sid = Integer.valueOf(parameters.getProperty("sid"));
+		final String tableName = parameters.getProperty("tableName");
+		final int colfusionUserId = Integer.valueOf(parameters.getProperty("userId"));
 
-        try {
-            if(metadataDbHandler.isInCurrentUserSession(sid, tableName, colfusionUserId)) {
-                metadataDbHandler.releaseTableLock(sid, tableName);
-            }
-            result.put("successful", true);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+		final MetadataDbHandler metadataDbHandler = DatabaseHandlerFactory.getMetadataDbHandler();
 
-        response.setCharacterEncoding("UTF-8");
-        response.setHeader("Content-Type", "application/json");
-        respond(response, result.toString());
+		final JSONObject result = new JSONObject();
 
-    }
+		try {
+			final ColumnTableInfoManager columnTableMng = new ColumnTableInfoManagerImpl();
+			final ColfusionColumnTableInfo columnTable = columnTableMng.findBySidAndOriginalTableName(sid, tableName);
+			final RelationKey relationKey = new RelationKey(tableName, columnTable.getDbTableName());
+
+			if(metadataDbHandler.isInCurrentUserSession(sid, relationKey, colfusionUserId)) {
+				metadataDbHandler.releaseTableLock(sid, relationKey);
+			}
+			result.put("successful", true);
+		} catch (final JSONException e) {
+			e.printStackTrace();
+		} catch (final SQLException e) {
+			e.printStackTrace();
+		}
+
+		response.setCharacterEncoding("UTF-8");
+		response.setHeader("Content-Type", "application/json");
+		respond(response, result.toString());
+
+	}
 }
