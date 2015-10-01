@@ -163,16 +163,18 @@ public class ColFusionOpenRefineProjectManager {
 					throws SQLException {
 		// Get and set column names
 
-		setProjectCol(project, metadataDbHandler.getColumnNames(sid));
+		final ArrayList<String> columNames = metadataDbHandler.getColumnNames(sid);
+
+		setProjectCol(project, columNames);
 
 		// Get and set rows
 		System.out.println(String.format("Table name in ColFusionOpenRefineProjectManager.setProject method is %s", tableInfo.getDbTableName()));
 
-		final int colCount = dbHandler.getColCount(sid, tableInfo);
+		//		final int colCount = dbHandler.getColCount(sid, tableInfo);
 
-		System.out.println(String.format("colCount in ColFusionOpenRefineProjectManager.setProject method is %d", colCount));
+		//		System.out.println(String.format("colCount in ColFusionOpenRefineProjectManager.setProject method is %d", colCount));
 
-		setProjectRow(project, dbHandler.getRows(tableInfo, colCount));
+		setProjectRow(project, dbHandler.getRows(tableInfo, columNames.size()));
 	}
 
 	public static void setProjectCol(final Project project, final ArrayList<String> columnNames) {
