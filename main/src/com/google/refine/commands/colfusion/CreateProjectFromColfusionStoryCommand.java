@@ -78,7 +78,7 @@ public class CreateProjectFromColfusionStoryCommand extends Command {
 				}
 
 				final ColFusionOpenRefineProjectManager colFusionOpenRefineProjectManager = new ColFusionOpenRefineProjectManager();
-				result.put("openrefineURL", colFusionOpenRefineProjectManager.createProjectToOpenRefine(sid, relationKey));
+				result.put("openrefinePath", colFusionOpenRefineProjectManager.createProjectToOpenRefine(sid, relationKey));
 			}
 			result.put("isEditing", isTableLocked && !isEditingByCurrentUser);
 			result.put("isTimeOut", isTimeOut);

@@ -69,12 +69,12 @@ public class ColFusionOpenRefineProjectManager {
 	public String createProjectToOpenRefine(final int sid, final RelationKey tableInfo)
 			throws Exception {
 		ProjectManager.singleton.setBusy(true);
-		String url = "";
+		String path = "";
 
 		final String fileDir = ConfigManager.getInstance().getProperty(PropertyKeys.COLFUSION_OPENREFINE_FOLDER);
-		final String openrefineUrl = ConfigManager.getInstance().getProperty(PropertyKeys.COLFUSION_OPENREFINE_URL);
+		final String openrefinePath = ConfigManager.getInstance().getProperty(PropertyKeys.COLFUSION_OPENREFINE_PATH);
 		System.out.println("************************************************");
-		System.out.println("OpenRefineUrl PRINT: " + openrefineUrl);
+		System.out.println("OpenRefinePath PRINT: " + openrefinePath);
 		System.out.println("************************************************");
 
 		System.out.println("BEFORE GET METADATA HANDLER");
@@ -144,9 +144,9 @@ public class ColFusionOpenRefineProjectManager {
 				projectLink = project.id + "";
 			}
 
-			url = openrefineUrl + projectLink;
+			path = openrefinePath + projectLink;
 
-			System.out.println(String.format("Turl that will be returned is %s", url));
+			System.out.println(String.format("Turl that will be returned is %s", path));
 
 		} catch (final Exception e) {
 			System.out.println(String.format("Something happened"));
@@ -155,7 +155,7 @@ public class ColFusionOpenRefineProjectManager {
 		} finally {
 			ProjectManager.singleton.setBusy(false);
 		}
-		return url;
+		return path;
 	}
 
 	private void setProject(final int sid, final Project project, final DatabaseHandlerBase dbHandler,
